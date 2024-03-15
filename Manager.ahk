@@ -229,15 +229,30 @@ if (!FileExist(PTCGLiveInstallDirectory . "\Pokemon TCG Live.exe")) {
     ExitApp()
 }
 
+tempDllPath := A_Temp . "\PTCGLiveZhMod.dll." . A_ScriptHwnd
+FileInstall("bin\Release\netstandard2.0\PTCGLiveZhMod.dll", tempDllPath, 1)
+modCurrentVersion := FileExist(ModDirectory . "\PTCGLiveZhMod.dll") ? FileGetVersion(ModDirectory . "\PTCGLiveZhMod.dll.") : "0.0.0.0"
+modCurrentVersionNumber := Number(StrReplace(modCurrentVersion, ".", ""))
+modNewVersion := FileGetVersion(tempDllPath)
+modNewVersionNumber := Number(StrReplace(modNewVersion, ".", ""))
+SafeFileDelete(tempDllPath)
+
 MainWindow := Gui("-MinimizeBox", WINDOW_TITLE)
 MainWindow.SetFont("s12", "Microsoft YaHei")
 
-InstallButton := MainWindow.AddButton("w180 h40 x60 y60 Center", "安装中文化模组")
-UninstallButton := MainWindow.AddButton("w180 h40 x60 y120 Center", "卸载中文化模组")
-InstallButton.OnEvent("Click", InstallButton_Click)
-UninstallButton.OnEvent("Click", UninstallButton_Click)
+if (modCurrentVersionNumber != 0) {
+    InstallButton := MainWindow.AddButton("w180 h40 x60 y40 Center", modNewVersionNumber > modCurrentVersionNumber ? "更新中文化模组" : "重新安装中文化模组")
+    InstallButton.OnEvent("Click", InstallButton_Click)
+    UninstallButton := MainWindow.AddButton("w180 h40 x60 y100 Center", "卸载中文化模组")
+    UninstallButton.OnEvent("Click", UninstallButton_Click)
+} else {
+    InstallButton := MainWindow.AddButton("w180 h60 x60 y80 Center", "安装中文化模组")
+    InstallButton.OnEvent("Click", InstallButton_Click)
+}
 
 MainWindow.SetFont("s10", "Microsoft YaHei")
+MainWindow.AddText("x4 y220", modCurrentVersionNumber == 0 ? "" : ("已安装中文化模组版本：" . modCurrentVersion))
+MainWindow.AddText("x4 y240", "中文化模组版本：" . modNewVersion)
 MainWindow.AddText("x4 y260", "模组管理器版本：" . (A_IsCompiled ? FileGetVersion(A_ScriptFullPath) : "dev"))
 MainWindow.AddLink("x180 y260", "<a href=`"https://github.com/Hill-98/ptcg-live-zh-mod`">开源仓库</a>")
 MainWindow.AddLink("x240 y260", "<a href=`"https://url.mivm.cn/ptcg-live-zh-mod-download`">下载地址</a>")
