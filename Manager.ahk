@@ -1,5 +1,5 @@
 ;@Ahk2Exe-Let APP_NAME = PTCGLiveZhModManager
-;@Ahk2Exe-Let APP_VERSION = 0.1.0.0
+;@Ahk2Exe-Let APP_VERSION = 0.1.0.1
 ;@Ahk2Exe-ExeName %A_ScriptDir%\bin\Release\Manager\%U_APP_NAME%.exe
 ;@Ahk2Exe-SetCopyright Hill-98@GitHub
 ;@Ahk2Exe-SetDescription %U_APP_NAME%
@@ -121,6 +121,8 @@ InstallMain(assetsPath := "") {
 UninstallMain(withBepInEx := false) {
     global PTCGLiveInstallDirectory, ModDirectory
 
+    SafeFileDelete(PTCGLiveInstallDirectory . "\winhttp.dll.bak")
+
     if (withBepInEx) {
         SafeFileDelete(PTCGLiveInstallDirectory . "\doorstop_config.ini")
         SafeFileDelete(PTCGLiveInstallDirectory . "\winhttp.dll")
@@ -207,6 +209,25 @@ UninstallButton_Click(button, info) {
     ExitApp()
 }
 
+DisableCheckbox_Click(checkbox, info) {
+    DisabledMod := checkbox.Value
+
+    if (DisabledMod && FileExist(PTCGLiveInstallDirectory . "\winhttp.dll")) {
+        FileMove(PTCGLiveInstallDirectory . "\winhttp.dll", PTCGLiveInstallDirectory . "\winhttp.dll.bak", true)
+        return
+    }
+
+    if (!DisabledMod && FileExist(PTCGLiveInstallDirectory . "\winhttp.dll.bak")) {
+        FileMove(PTCGLiveInstallDirectory . "\winhttp.dll.bak", PTCGLiveInstallDirectory . "\winhttp.dll", true)
+        return
+    }
+
+    DisabledMod := !DisabledMod
+    checkbox.Value := DisabledMod ? 1 : 0
+
+    MsgBox("出现错误，请尝试重新安装中文化模组。", WINDOW_TITLE, 0x10)
+}
+
 if (ProcessExist("Pokemon TCG Live.exe")) {
     MsgBox("检测到 Pokemon TCG Live 正在运行，请先关闭游戏再运行此程序。", WINDOW_TITLE, 0x30)
     ExitApp()
@@ -245,6 +266,8 @@ if (modCurrentVersionNumber != 0) {
     InstallButton.OnEvent("Click", InstallButton_Click)
     UninstallButton := MainWindow.AddButton("w180 h40 x60 y100 Center", "卸载中文化模组")
     UninstallButton.OnEvent("Click", UninstallButton_Click)
+    DisableCheckbox := MainWindow.AddCheckbox("x100 y150 " . (FileExist(PTCGLiveInstallDirectory . "\winhttp.dll") ? "" : "Checked"), "临时禁用")
+    DisableCheckbox.OnEvent("Click", DisableCheckbox_Click)
 } else {
     InstallButton := MainWindow.AddButton("w180 h60 x60 y80 Center", "安装中文化模组")
     InstallButton.OnEvent("Click", InstallButton_Click)
