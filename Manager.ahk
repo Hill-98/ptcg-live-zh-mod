@@ -134,9 +134,10 @@ InstallButton_Click(button, info) {
     global MainWindow
     MainWindow.Hide()
 
-    FileInstall("DISCLAIMER.txt", A_Temp . "\" . A_ScriptName . ".DISCLAIMER.txt", 1)
+    DISCLAIMER := A_Temp . "\" . A_ScriptName . ".DISCLAIMER.txt"
+    FileInstall("DISCLAIMER.txt", DISCLAIMER, 1)
 
-    if (MsgBox(FileRead(A_Temp . "\" . A_ScriptName . ".DISCLAIMER.md", "UTF-8") . "`n点击【是】代表同意上述免责声明`n点击【否】代表不同意上述免责声明", WINDOW_TITLE, 0x4 + 0x40) == "No") {
+    if (MsgBox(FileRead(DISCLAIMER, "UTF-8") . "`n点击【是】代表同意上述免责声明`n点击【否】代表不同意上述免责声明", WINDOW_TITLE, 0x4 + 0x40) == "No") {
         ExitApp()
     }
 
