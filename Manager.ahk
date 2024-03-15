@@ -93,7 +93,7 @@ InstallMain(assetsPath := "") {
 
     FileInstall("bin\Release\netstandard2.0\PTCGLiveZhMod.dll", ModDirectory . "\PTCGLiveZhMod.dll", 1)
     FileInstall("bin\Release\Manager\names.txt", ModDatabaseDirectory . "\names.txt", 1)
-    FileInstall("fonts\arialuni_sdf_u2019", ModFontsDirectory . "\arialuni_sdf_u2019", 1)
+    FileInstall("fonts\arialuni_sdf_u2019.asset", ModFontsDirectory . "\arialuni_sdf_u2019", 1)
     FileInstall("text\startup.txt", ModTextDirectory . "\startup.txt", 1)
 
     if (!FileExist(assetsPath)) {
