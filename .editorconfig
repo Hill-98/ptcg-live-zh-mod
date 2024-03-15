@@ -1,0 +1,25 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+# Default severity for all analyzer diagnostics
+dotnet_analyzer_diagnostic.severity = silent
+
+[*.bat]
+end_of_line = crlf
+
+[*.ps1]
+charset = utf-16be
+end_of_line = crlf
+
+[*.{yml, yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

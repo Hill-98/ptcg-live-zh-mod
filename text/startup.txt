@@ -1,0 +1,45 @@
+startup_language_title:选择您的语言
+settings_en:English (中文)
+settings_fr:Français
+settings_es:Español
+settings_de:Deutsch
+settings_it:Italiano
+settings_ptbr:Português (Brasil)
+settings_esla:Español latino
+settings_en_lower:english (中文)
+settings_fr_lower:français
+settings_es_lower:español
+settings_de_lower:deutsch
+settings_it_lower:italiano
+settings_ptbr_lower:português (Brasil)
+settings_esla_lower:español latino
+startup_select_language:选择语言
+startup_language_confirm:使用 {0} 作为您的语言吗？
+global_continue:继续
+loading_screen_1:正在加载资源 {0}/{1}
+loading_screen_2:正在从服务器加载数据 {0}/{1}
+loading_screen_3:正在加载本地资源 {0}/{1}
+loading_screen_4:正在初始化场景 {0}/{1}
+loading_screen_5:正在捕捉野生宝可梦 {0}/{1}
+loading_screen_6:正在打印卡片 {0}/{1}
+loading_screen_7:正在唤醒教授 {0}/{1}
+loading_screen_8:正在为商店补货 {0}/{1}
+app_update_available:Pokémon TCG Live 有新版本。请下载最新版本以继续游戏。
+app_update_now:更新
+app_maintenance:我们目前正在进行维护。请稍后再试。
+app_error_connection:找不到网络连接。请检查您的网络并重试。
+global_notice:通知
+app_error_failed_load:加载 Pokémon TCG Live 时出现问题。请重试。<br>错误：{0}
+app_error_failed_download:下载附加内容时出现问题。请重试。 <br>错误：{0}
+global_retry:重试
+global_cancel:取消
+global_ok:确定
+inbox_scheduled_maintenance:服务器例行维护计划将于 UTC 时间 {0} 进行。预计于 UTC 时间 {1} 结束。感谢您的耐心等待。
+ptcs_forgot_un:忘记用户名了吗？
+ptcs_forgot_pw:忘记密码了吗？
+ptcs_create:创建账户！
+overflow_quit:退出游戏
+app_specs_min:此设备的配置不足以游玩 Pokémon Trading Card Game Live。请在另一个设备尝试。
+app_device_unsupported:此设备不受支持。
+app_ios_migration:要创建您的 Pokémon Trainer Club 帐户，请访问 {0}
+app_error_connectrion_lost:您的网络连接已丢失。请检查您的网络并重试。
