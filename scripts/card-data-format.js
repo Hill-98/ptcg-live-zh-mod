@@ -145,6 +145,9 @@ const cardFiles = fs.readdirSync(cardsDir);
 
 cardFiles.forEach((file) => {
     const card = new CardObject(fs.readFileSync(join(cardsDir, file), { encoding: 'utf-8' }));
+    if (card.id.endsWith('_ph')) {
+        return;
+    }
     if (card.archetypeID === 0) {
         console.warn(card.id + "'s archetypeID is 0");
     } else {

@@ -160,11 +160,11 @@ for (const hash in database) {
     }
 
     if (translate.trim() !== '') {
+        translatedCount++;
         row.translated_text = translate;
         console.log('translated_text: ' + row.translated_text);
-        writeFile(argv[0], JSON.stringify(database, null, 4), { encoding: 'utf8' });
-        translatedCount++;
         console.log(`Translated count: ${translatedCount}/${translatedTotalCount}`);
+        writeFile(argv[0], JSON.stringify(database, null, 4), { encoding: 'utf8' });
     }
     console.log('');
 }
