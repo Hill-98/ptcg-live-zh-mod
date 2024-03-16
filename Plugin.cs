@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PTCGLiveZhMod
 {
-    [BepInPlugin("c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3", "ptcg-live-zh-mod", "0.1.0")]
+    [BepInPlugin("c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3", "ptcg-live-zh-mod", "0.1.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static string BaseDirectory { get { return baseDirectory; } }
@@ -110,6 +110,11 @@ namespace PTCGLiveZhMod
 
         public static bool GetLocText(string key, out string text)
         {
+            text = string.Empty;
+            if (string.IsNullOrEmpty(key?.Trim()))
+            {
+                return false;
+            }
             return locTextTable.TryGetValue(key, out text);
         }
 

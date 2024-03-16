@@ -1,15 +1,15 @@
+using CardDatabase.DataAccess;
 using HarmonyLib;
+using SharedLogicUtils.source.CardData;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using TMPro;
 using TPCI.AssetBundleSystem;
-using TPCI.Localization;
-using TPCI.CardShaders;
 using TPCI.Build;
+using TPCI.CardShaders;
+using TPCI.Localization;
 using UnityEngine;
-using CardDatabase.DataAccess;
-using SharedLogicUtils.source.CardData;
-using System.Data;
 
 namespace PTCGLiveZhMod
 {
@@ -20,9 +20,9 @@ namespace PTCGLiveZhMod
         /// </summary>
         [HarmonyPatch(typeof(AssetBundle), nameof(AssetBundle.LoadAssetAsync), new Type[] { typeof(string), typeof(Type) })]
         [HarmonyPrefix]
-        static bool AssetBundle_LoadAssetAsyncPrefix(ref AssetBundleRequest __result, string name)
+        static bool AssetBundle_LoadAssetAsyncPrefix(ref AssetBundleRequest __result, string name, Type type)
         {
-            if (name.EndsWith("_t"))
+            if (name.EndsWith("_t") && type == typeof(Texture2D))
             {
                 var bundleName = name.Substring(0, name.Length - 2);
                 var bundle = AssetBundleManagerX.LoadAssetBundle(bundleName);
@@ -65,9 +65,12 @@ namespace PTCGLiveZhMod
             return true;
         }
 
+        /// <summary>
+        /// 本地化卡牌数据库
+        /// </summary>
         [HarmonyPatch(typeof(ConfigCardDataTablesProvider), nameof(ConfigCardDataTablesProvider.GetCardDataTables))]
         [HarmonyPostfix]
-        static void QueryableCardDataTablesRepository_tablesLookupSeterPostfix(IEnumerable<CardDataTable> ___dataTables)
+        static void QueryableCardDataTablesRepository_GetCardDataTablesPostfix(IEnumerable<CardDataTable> ___dataTables)
         {
             foreach (var item in ___dataTables)
             {
@@ -92,7 +95,7 @@ namespace PTCGLiveZhMod
         [HarmonyPostfix]
         static void GameVersionInfo_GetGameVersionPostfix(ref string __result)
         {
-            __result = __result + "\n" + "中文化模组由 Hill-98 (小山) 提供 & 中文化卡牌资源由 Kuyo 提供";
+            __result = __result + "\n" + "中文化模组由 Hill-98 (小山) 制作 & 中文化卡牌资源由 Kuyo 提供";
         }
 
         /// <summary>
