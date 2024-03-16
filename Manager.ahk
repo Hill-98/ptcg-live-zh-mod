@@ -1,5 +1,5 @@
 ;@Ahk2Exe-Let APP_NAME = PTCGLiveZhModManager
-;@Ahk2Exe-Let APP_VERSION = 0.1.0.1
+;@Ahk2Exe-Let APP_VERSION = 0.1.1.0
 ;@Ahk2Exe-ExeName %A_ScriptDir%\bin\Release\Manager\%U_APP_NAME%.exe
 ;@Ahk2Exe-SetCopyright Hill-98@GitHub
 ;@Ahk2Exe-SetDescription %U_APP_NAME%

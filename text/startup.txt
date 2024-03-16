@@ -34,7 +34,7 @@ app_error_failed_download:下载附加内容时出现问题。请重试。 <br>�
 global_retry:重试
 global_cancel:取消
 global_ok:确定
-inbox_scheduled_maintenance:服务器例行维护计划将于 UTC 时间 {0} 进行。预计于 UTC 时间 {1} 结束。感谢您的耐心等待。
+inbox_scheduled_maintenance:服务器例行维护计划将于格林尼治标准时间 {0} 进行。预计于格林尼治标准时间 {1} 结束。感谢您的耐心等待。
 ptcs_forgot_un:忘记用户名了吗？
 ptcs_forgot_pw:忘记密码了吗？
 ptcs_create:创建账户！
