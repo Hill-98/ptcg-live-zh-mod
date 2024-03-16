@@ -1,0 +1,3 @@
+files:
+  - source: /text_untranslated/*.txt
+    translation: /text_%locale%/%original_file_name%
