@@ -1,3 +1,0 @@
-files:
-  - source: /databases_untranslated/*.json
-    translation: /databases_%locale%/%original_file_name%

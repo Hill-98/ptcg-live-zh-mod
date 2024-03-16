@@ -6,6 +6,7 @@ assets
 dist
 
 # Translate files
+paratranz
 .translate.txt
 
 # User-specific files
