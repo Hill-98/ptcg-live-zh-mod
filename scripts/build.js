@@ -9,7 +9,7 @@ if (process.platform !== 'win32') {
     process.exit(1);
 }
 
-const cardDatabasesDir = join(process.cwd(), 'CardDatabases');
+const cardDatabasesDir = join(process.cwd(), 'database_zh-CN');
 const managerReleaseDir = join(process.cwd(), 'bin/Release/Manager');
 const spawnOptions = {
     cwd: process.cwd(),
@@ -24,14 +24,9 @@ if (!fs.existsSync(managerReleaseDir)) {
 console.log('- Building mod dll');
 
 console.log('- Building card databases');
-/**
- * @typedef {Object} DatabaseRowObject
- * @property {string} text
- * @property {string=} translated_text
- */
 fs.readdirSync(cardDatabasesDir).forEach((v) => {
     const file = join(cardDatabasesDir, v);
-    /** @type {Object<string, DatabaseRowObject>} */
+    /** @type {Object<string, string>} */
     const database = JSON.parse(fs.readFileSync(file, { encoding: 'utf8' }));
     const outputFile = join(managerReleaseDir, parse(file).name + '.txt');
     if (fs.existsSync(outputFile)) {
@@ -40,12 +35,8 @@ fs.readdirSync(cardDatabasesDir).forEach((v) => {
     console.log('- Building card database: ' + file);
 
     for (const hash in database) {
-        const row = database[hash];
-        if (typeof row.translated_text !== 'string' || row.translated_text.trim() === '') {
-            continue;
-        }
-
-        fs.appendFileSync(outputFile, hash + ':' + row.translated_text + '\n', { encoding: 'utf8' });
+        const text = database[hash];
+        fs.appendFileSync(outputFile, hash + ':' + text + '\n', { encoding: 'utf8' });
     }
 });
 

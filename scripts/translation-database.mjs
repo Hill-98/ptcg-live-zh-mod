@@ -2,12 +2,15 @@
 import { spawnSync } from 'child_process';
 import { readFileSync as readFile, writeFileSync as writeFile, writeFileSync } from 'fs';
 import { request } from 'https';
-import { basename, join } from 'path';
+import { basename, join, parse } from 'path';
 import { createInterface } from 'readline/promises';
 
 const argv = process.argv.slice(2);
 
-if (argv.length < 1) {
+console.error(`TODO: new implementation`);
+process.exit(1);
+
+if (argv.length < 2) {
     console.error(`Usage: ${basename(import.meta.url)} <card database>`);
     process.exit(1);
 }
@@ -116,7 +119,6 @@ let translatedCount = 0;
 const translatedTotalCount = Object.keys(database).length;
 
 for (const hash in database) {
-    const row = database[hash];
     if (typeof row.translated_text === 'string' && row.translated_text.trim() !== '') {
         translatedCount++;
         continue;
@@ -164,9 +166,11 @@ for (const hash in database) {
         row.translated_text = translate;
         console.log('translated_text: ' + row.translated_text);
         console.log(`Translated count: ${translatedCount}/${translatedTotalCount}`);
-        writeFile(argv[0], JSON.stringify(database, null, 4), { encoding: 'utf8' });
+        writeFile(join(process.cwd(), 'database_zh-CN', basename(argv[0])), JSON.stringify(database, null, 4), { encoding: 'utf8' });
     }
     console.log('');
 }
+
+writeFile(argv[0], JSON.stringify(database, null, 4), { encoding: 'utf8' });
 
 process.exit(0);

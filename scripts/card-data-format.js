@@ -11,7 +11,7 @@ if (argv.length < 1) {
 }
 
 const cardsDir = argv.shift();
-const databaseDir = join(process.cwd(), 'CardDatabases');
+const databaseDir = join(process.cwd(), 'databases');
 
 if (!fs.existsSync(databaseDir)) {
     fs.mkdirSync(databaseDir);
@@ -104,42 +104,50 @@ class CardObject {
  */
 
 class CardDatabase {
-    #file = '';
-    /** @type {Object<string, DatabaseRowObject>} */
-    #json = Object.create(null);
+    #listFile = '';
+    #textFile = '';
+    /** @type {Object<string, string[]>} */
+    #cardList = Object.create(null);
+    /** @type {Object<string, string>} */
+    #textTable = Object.create(null);
 
-    constructor(file) {
-        this.#file = file;
+    constructor(textFile, listFile) {
+        this.#textFile = textFile;
+        this.#listFile = listFile;
         try {
-            this.#json = JSON.parse(fs.readFileSync(file, { encoding: 'utf8' }));
-        } catch { }
+            this.#cardList = JSON.parse(fs.readFileSync(listFile, { encoding: 'utf8' }));
+            this.#textTable = JSON.parse(fs.readFileSync(textFile, { encoding: 'utf8' }));
+        } catch {
+
+        }
     }
 
     append(text, cardID) {
         const hash = createHash('md5').update(text).digest('hex');
-        if (!Object.prototype.hasOwnProperty.bind(this.#json)(hash)) {
-            this.#json[hash] = {
-                text,
-                cardIDs: [],
-            };
+        if (!Object.prototype.hasOwnProperty.bind(this.#textTable)(hash)) {
+            this.#textTable[hash] = text;
         }
-        if (!this.#json[hash].cardIDs.includes(cardID)) {
-            this.#json[hash].cardIDs.push(cardID);
+        if (!Object.prototype.hasOwnProperty.bind(this.#cardList)(hash)) {
+            this.#cardList[hash] = [];
+        }
+        if (!this.#cardList[hash].includes(cardID)) {
+            this.#cardList[hash].push(cardID);
         };
     };
 
     get count() {
-        return Object.keys(this.#json).length;
+        return Object.keys(this.#textTable).length;
     }
 
     save() {
-        fs.writeFileSync(this.#file, JSON.stringify(this.#json, null, 4), { encoding: 'utf8' });
+        fs.writeFileSync(this.#listFile, JSON.stringify(this.#cardList, null, 4), { encoding: 'utf8' });
+        fs.writeFileSync(this.#textFile, JSON.stringify(this.#textTable, null, 4), { encoding: 'utf8' });
     }
 }
 
-const namesDatabase = new CardDatabase(join(databaseDir, 'names.json'));
-const attksNameDatabase = new CardDatabase(join(databaseDir, 'attks-name.json'));
-const attksTextDatabase = new CardDatabase(join(databaseDir, 'attks-text.json'));
+const namesDatabase = new CardDatabase(join(databaseDir + '_untranslated', 'names.json'), join(databaseDir + '_untranslated', 'names.json'));
+const attksNameDatabase = new CardDatabase(join(databaseDir + '_untranslated', 'attks-name.json'), join(databaseDir, 'attks-name.json'));
+const attksTextDatabase = new CardDatabase(join(databaseDir + '_untranslated', 'attks-text.json'), join(databaseDir, 'attks-text.json'));
 
 const cardFiles = fs.readdirSync(cardsDir);
 
