@@ -304,9 +304,7 @@ app.on('web-contents-created', (ev, contents) => {
 });
 
 app.on('window-all-closed', () => {
-    if (isOSX) {
-        app.quit();
-    }
+    app.quit();
 });
 
 ipcWrapper('detectPTCGLInstallDirectory', detectPTCGLInstallDirectory);
