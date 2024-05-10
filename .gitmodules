@@ -1,0 +1,3 @@
+[submodule "NeuExt.PTCGLUtility"]
+	path = NeuExt.PTCGLUtility
+	url = https://github.com/Hill-98/NeuExt.PTCGLUtility.git
