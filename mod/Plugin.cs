@@ -1,6 +1,8 @@
 using BepInEx;
 using BepInEx.Logging;
+using CardDatabase.DataAccess;
 using HarmonyLib;
+using PTCGLiveZhMod.Patches;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,12 +11,14 @@ using System.Threading.Tasks;
 
 namespace PTCGLiveZhMod
 {
-    [BepInPlugin("c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3", "ptcg-live-zh-mod", "0.1.1")]
+    [BepInPlugin("c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3", "ptcg-live-zh-mod", "0.2.0")]
     public class Plugin : BaseUnityPlugin
     {
-        public static string BaseDirectory { get { return baseDirectory; } }
+        public static string BaseDirectory { get { return Path.GetDirectoryName(Instance.Info.Location); } }
 
         public static string AssetsDirectory { get { return Path.Combine(BaseDirectory, "assets"); } }
+
+        public static bool AssetsProvidedByKuyo { get { return File.Exists(Path.Combine(AssetsDirectory, "kuyo.provided")); } }
 
         public static string CardsDirectory { get { return Path.Combine(BaseDirectory, "cards"); } }
 
@@ -24,13 +28,13 @@ namespace PTCGLiveZhMod
 
         public static string TextDirectory { get { return Path.Combine(BaseDirectory, "text"); } }
 
-        public static Plugin Instance { get { return _instance; } }
+        public static Plugin Instance { get; private set; }
 
-        public static ManualLogSource LoggerInstance { get { return _instance.Logger; } }
+        public static ManualLogSource LoggerInstance { get { return Instance.Logger; } }
 
-        private static Plugin _instance { get; set; }
+        private static readonly Dictionary<string, string> attksNameDatabase = new Dictionary<string, string>();
 
-        private static string baseDirectory { get; set; }
+        private static readonly Dictionary<string, string> attksTextDatabase = new Dictionary<string, string>();
 
         private static readonly Dictionary<string, string> locTextTable = new Dictionary<string, string>();
 
@@ -42,8 +46,13 @@ namespace PTCGLiveZhMod
 
         private void Awake()
         {
-            _instance = this;
-            baseDirectory = Path.GetDirectoryName(Info.Location);
+            Configuration.Initialization(Config);
+            Instance = this;
+
+            if (File.Exists(Path.Combine(BaseDirectory, "disabled")))
+            {
+                return;
+            }
 
             if (Directory.Exists(TextDirectory)) {
                 var locTextFiles = Directory.GetFiles(TextDirectory, "*.txt");
@@ -53,13 +62,22 @@ namespace PTCGLiveZhMod
                 }
             }
 
+            LoadLocFile(Path.Combine(DatabasesDirectory, "attks-name.txt"), attksNameDatabase);
+            LoadLocFile(Path.Combine(DatabasesDirectory, "attks-text.txt"), attksTextDatabase);
             LoadLocFile(Path.Combine(DatabasesDirectory, "names.txt"), namesDatabase);
             LoadLocFile(untranslatedTextFile, untranslatedTextTable);
 
             try
             {
                 var asmNamePather = Harmony.CreateAndPatchAll(typeof(AssemblyNamePatcher));
-                Harmony.CreateAndPatchAll(typeof(Patcher));
+                Harmony.CreateAndPatchAll(typeof(AssetBundlePatcher));
+                Harmony.CreateAndPatchAll(typeof(CardDatabasePatcher));
+                if (Configuration.EnableCardGraphicText.Value)
+                {
+                    Harmony.CreateAndPatchAll(typeof(CardGraphicPatcher));
+                }
+                Harmony.CreateAndPatchAll(typeof(LocalizationPatcher));
+                Harmony.CreateAndPatchAll(typeof(TextMeshProPatcher));
                 asmNamePather.UnpatchSelf();
             }
             catch (Exception ex)
@@ -123,6 +141,22 @@ namespace PTCGLiveZhMod
             if (namesDatabase.TryGetValue(Helper.md5sum(row["LocalizedCardName"].ToString()), out var name))
             {
                 row["LocalizedCardName"] = name;
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                var key = "EN Attack Name" + (i > 0 ? $" {i + 1}" : "");
+                if (attksNameDatabase.TryGetValue(Helper.md5sum(row[key].ToString()), out var value))
+                {
+                    row[key] = value;
+                }
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                var key = "EN Attack Text" + (i > 0 ? $" {i + 1}" : "");
+                if (attksTextDatabase.TryGetValue(Helper.md5sum(row[key].ToString()), out var value))
+                {
+                    row[key] = value;
+                }
             }
         }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace PTCGLiveZhMod
 {
-    class Helper
+    internal static class Helper
     {
         public static string md5sum(string input)
         {

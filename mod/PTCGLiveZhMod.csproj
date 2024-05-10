@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyVersion>0.2.2.0</AssemblyVersion>
+    <FileVersion>0.2.0</FileVersion>
+    <Version>$(FileVersion)</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>DLLs\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>DLLs\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>DLLs\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Harmony">
+      <HintPath>DLLs\BepInEx.Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx.Preloader">
+      <HintPath>DLLs\BepInEx.Preloader.dll</HintPath>
+    </Reference>
+    <Reference Include="CardDatabase.DataAccess">
+      <HintPath>DLLs\CardDatabase.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="HarmonyXInterop">
+      <HintPath>DLLs\HarmonyXInterop.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>DLLs\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>DLLs\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>DLLs\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>DLLs\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>DLLs\MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>DLLs\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="SharedLogicUtils">
+      <HintPath>DLLs\SharedLogicUtils.dll</HintPath>
+    </Reference>
+    <Reference Include="TPCIAssetBundleSystem">
+      <HintPath>DLLs\TPCIAssetBundleSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="TPCIBuildtoolsRuntime">
+      <HintPath>DLLs\TPCIBuildtoolsRuntime.dll</HintPath>
+    </Reference>
+    <Reference Include="TPCICardShaders">
+      <HintPath>DLLs\TPCICardShaders.dll</HintPath>
+    </Reference>
+    <Reference Include="TPCILocalization">
+      <HintPath>DLLs\TPCILocalization.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>DLLs\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>DLLs\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>DLLs\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>DLLs\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>DLLs\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="XUnity.Common">
+      <HintPath>DLLs\XUnity.Common.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
