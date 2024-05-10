@@ -1,39 +1,36 @@
 #!/usr/bin/env node
 import { spawnSync } from 'child_process';
-import { readFileSync as readFile, writeFileSync as writeFile, writeFileSync } from 'fs';
+import { existsSync as exists, readFileSync as readFile, writeFileSync as writeFile } from 'fs';
 import { request } from 'https';
-import { basename, join, parse } from 'path';
+import { basename, join } from 'path';
 import { createInterface } from 'readline/promises';
 
 const argv = process.argv.slice(2);
 
-console.error(`TODO: new implementation`);
-process.exit(1);
-
-if (argv.length < 2) {
-    console.error(`Usage: ${basename(import.meta.url)} <card database>`);
+if (argv.length < 1) {
+    console.error(`Usage: ${basename(import.meta.url)} <card database name>`);
     process.exit(1);
 }
 
-/**
- * @typedef {Object} DatabaseRowObject
- * @property {string} text
- * @property {string=} translated_text
- */
-
-/** @type {Object<string, DatabaseRowObject>} */
-const database = JSON.parse(readFile(argv[0], { encoding: 'utf8' }));
+const databaseName = argv.shift();
+const databasesTranslatedFile = join(process.cwd(), 'databases_zh-CN/' + databaseName + '.json');
+/** @type {Object<string, string[]>} */
+const database = JSON.parse(readFile(join(process.cwd(), 'databases/' + databaseName + '.json'), { encoding: 'utf8' }));
+/** @type {Object<string, string>} */
+const databasesUntranslated = JSON.parse(readFile(join(process.cwd(), 'databases_untranslated/' + databaseName + '.json'), { encoding: 'utf8' }));
+/** @type {Object<string, string>} */
+const databasesTranslated = exists(databasesTranslatedFile) ? JSON.parse(readFile(databasesTranslatedFile), { encoding: 'utf8' }) : {};
 /** @type {Map<string, string>} */
 const dictionary = new Map();
+const dictionaryJSON = require('../dictionary.json');
+
+Object.keys(dictionaryJSON).forEach((k) => {
+    dictionary.set(k, dictionaryJSON[k]);
+});
 
 const copyText = function copyText(text) {
     writeFile(join(process.cwd(), '.translate.txt'), text, { encoding: 'utf8' });
     spawnSync('cmd.exe', ['/c', 'clip.exe < .translate.txt'], { cwd: process.cwd() });
-};
-
-// TODO: 待实现
-const getDictionary = function getDictionary() {
-
 };
 
 /**
@@ -94,21 +91,11 @@ const tryTranslate = function tryTranslate(text) {
         const t = text.replace(key, '').trim();
         const result = dictionary.get(t);
         if (result) {
-            return text.replace(t, result).replace(key, key.trim());
+            return text.replace(t, result).replace(key, key.trim().replace(/^-/, ''));
         }
     }
     return '';
 };
-
-readFile(join(process.cwd(), 'dictionary.txt'), { encoding: 'utf8' }).split('\n').forEach((line) => {
-    const i = line.indexOf(':');
-    if (i <= 0 || line.startsWith('#')) {
-        return;
-    }
-    const text = line.substring(0, i).trim();
-    const translated_text = line.substring(i + 1).trim();
-    dictionary.set(text, translated_text);
-});
 
 const rl = createInterface({
     input: process.stdin,
@@ -116,18 +103,22 @@ const rl = createInterface({
 });
 
 let translatedCount = 0;
-const translatedTotalCount = Object.keys(database).length;
+const translatedTotalCount = Object.keys(databasesUntranslated).length;
 
 for (const hash in database) {
-    if (typeof row.translated_text === 'string' && row.translated_text.trim() !== '') {
+    if (typeof databasesTranslated[hash] === 'string' && databasesTranslated[hash].trim() !== '') {
         translatedCount++;
         continue;
     }
-    console.log('hash: ' + hash);
-    console.log('text: ' + row.text);
-    copyText(row.text);
 
-    let translate = tryTranslate(row.text);
+    const text = databasesUntranslated[hash];
+
+    console.log('hash: ' + hash);
+    console.log('text: ' + text);
+    console.log('in cards: ' + database[hash].join(', '));
+    copyText(text.replace('[Ability] ', ''));
+
+    let translate = tryTranslate(text.replace('[Ability] ', ''));
     console.log('Try translate: ' + (translate ? translate : '(empty)'));
 
     let onlineResult = [];
@@ -137,7 +128,7 @@ for (const hash in database) {
     if (result === 'q') {
         console.log('Get online results...');
         try {
-            onlineResult = await queryPmtcgo(row.text);
+            onlineResult = await queryPmtcgo(text);
         } catch (err) {
             console.error(err);
         }
@@ -163,14 +154,15 @@ for (const hash in database) {
 
     if (translate.trim() !== '') {
         translatedCount++;
-        row.translated_text = translate;
-        console.log('translated_text: ' + row.translated_text);
+        if (text.startsWith('[Ability] ')) {
+            translate = '[Ability] ' + translate;
+        }
+        databasesTranslated[hash] = translate;
+        console.log('translated_text: ' + translate);
         console.log(`Translated count: ${translatedCount}/${translatedTotalCount}`);
-        writeFile(join(process.cwd(), 'database_zh-CN', basename(argv[0])), JSON.stringify(database, null, 4), { encoding: 'utf8' });
+        writeFile(databasesTranslatedFile, JSON.stringify(databasesTranslated, null, 4), { encoding: 'utf8' });
     }
     console.log('');
 }
-
-writeFile(argv[0], JSON.stringify(database, null, 4), { encoding: 'utf8' });
 
 process.exit(0);

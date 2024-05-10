@@ -111,9 +111,9 @@ class CardDatabase {
     /** @type {Object<string, string>} */
     #textTable = Object.create(null);
 
-    constructor(textFile, listFile) {
-        this.#textFile = textFile;
+    constructor(listFile, textFile) {
         this.#listFile = listFile;
+        this.#textFile = textFile;
         try {
             this.#cardList = JSON.parse(fs.readFileSync(listFile, { encoding: 'utf8' }));
             this.#textTable = JSON.parse(fs.readFileSync(textFile, { encoding: 'utf8' }));
@@ -124,10 +124,10 @@ class CardDatabase {
 
     append(text, cardID) {
         const hash = createHash('md5').update(text).digest('hex');
-        if (!Object.prototype.hasOwnProperty.bind(this.#textTable)(hash)) {
+        if (!Object.prototype.hasOwnProperty.call(this.#textTable, hash)) {
             this.#textTable[hash] = text;
         }
-        if (!Object.prototype.hasOwnProperty.bind(this.#cardList)(hash)) {
+        if (!Object.prototype.hasOwnProperty.call(this.#cardList, hash)) {
             this.#cardList[hash] = [];
         }
         if (!this.#cardList[hash].includes(cardID)) {
@@ -145,9 +145,9 @@ class CardDatabase {
     }
 }
 
-const namesDatabase = new CardDatabase(join(databaseDir + '_untranslated', 'names.json'), join(databaseDir + '_untranslated', 'names.json'));
-const attksNameDatabase = new CardDatabase(join(databaseDir + '_untranslated', 'attks-name.json'), join(databaseDir, 'attks-name.json'));
-const attksTextDatabase = new CardDatabase(join(databaseDir + '_untranslated', 'attks-text.json'), join(databaseDir, 'attks-text.json'));
+const namesDatabase = new CardDatabase(join(databaseDir, 'names.json'), join(databaseDir + '_untranslated', 'names.json'));
+const attksNameDatabase = new CardDatabase(join(databaseDir, 'attks-name.json'), join(databaseDir + '_untranslated', 'attks-name.json'));
+const attksTextDatabase = new CardDatabase(join(databaseDir, 'attks-text.json'), join(databaseDir + '_untranslated', 'attks-text.json'));
 
 const cardFiles = fs.readdirSync(cardsDir);
 
@@ -174,3 +174,5 @@ cardFiles.forEach((file) => {
 namesDatabase.save();
 attksNameDatabase.save();
 attksTextDatabase.save();
+
+
