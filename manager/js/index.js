@@ -148,15 +148,15 @@ const refreshState = async function refreshState() {
 
         if (versionParse(installedModVersion) < versionParse(modVersion)) {
             INSTALL_BUTTON.dataset.action = 'update';
-            INSTALL_BUTTON.textContent = '更新汉化模组';
+            INSTALL_BUTTON.textContent = '更新中文化模组';
         } else {
             INSTALL_BUTTON.dataset.action = 'reinstall';
-            INSTALL_BUTTON.textContent = '重新安装汉化模组';
+            INSTALL_BUTTON.textContent = '重新安装中文化模组';
         }
 
         PLUGIN_SWITCH.checked = await plugin.switchState();
     } else {
-        INSTALL_BUTTON.textContent = '安装汉化模组';
+        INSTALL_BUTTON.textContent = '安装中文化模组';
         UNINSTALL_BUTTON.setAttribute('disabled', '');
         PLUGIN_SWITCH.checked = false;
         PLUGIN_SWITCH.setAttribute('disabled', '');
