@@ -21,7 +21,8 @@ const findBinaryInPath = function findBinaryInPath(name) {
             const fullPath = join(path, name + value);
             if (fs.existsSync(fullPath)) {
                 try {
-                    return fs.statSync(fullPath).isFile() && (isWindows || fs.accessSync(fullPath, fs.constants.X_OK));
+                    fs.accessSync(fullPath, fs.constants.X_OK);
+                    return fs.statSync(fullPath).isFile();
                 } catch {
                 }
             }
