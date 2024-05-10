@@ -2,9 +2,6 @@
 assets
 *.assets.zip
 
-# Dist files
-dist
-
 # Translate files
 paratranz
 .translate.txt
