@@ -63,7 +63,6 @@ const config = {
                     ...fs.readdirSync(join(contentsPath, 'Frameworks/Electron Framework.framework/Versions/Current/Resources'), { withFileTypes: true }),
                     ...fs.readdirSync(resourcesPath, { withFileTypes: true }),
                 ].forEach(deleteUselessLanguageFile.bind(this, 'lproj'));
-                fs.rmSync(join(appAsarUnpackedPath, 'bin'), { recursive: true });
                 fs.rmSync(join(appFilesPath, 'BepInEx_x64_5.4.22.0.zip'));
             } else if (packageResult.platform === 'win32') {
                 fs.readdirSync(join(outPath, 'locales'), { withFileTypes: true }).forEach(deleteUselessLanguageFile.bind(this, 'pak'));
