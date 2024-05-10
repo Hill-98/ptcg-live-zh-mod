@@ -27,7 +27,7 @@ const findBinaryInPath = function findBinaryInPath(name) {
             }
             return false;
         });
-        if (ext) {
+        if (ext !== undefined) {
             return name + ext;
         }
     }
@@ -52,17 +52,26 @@ if (fs.existsSync(managerModDir)) {
 }
 fs.mkdirSync(managerModDir);
 
-console.log('- Building mod dll');
-const dotnetCLI = findBinaryInPath('dotnet');
-if (dotnetCLI) {
-    const dotnet = spawnSync(dotnetCLI, [
-        'build',
-        '--configuration', 'Release',
-    ], { ...spawnOptions, cwd: modDir });
-    assert(dotnet.status === 0, 'An error occurred while building the mod dll.');
-    fs.cpSync(join(modDir, 'bin/Release/netstandard2.0/PTCGLiveZhMod.dll'), join(managerModDir, 'PTCGLiveZhMod.dll'));
-} else {
-    console.log('* dotnet does not exist, skip building.');
+const curlCLI = findBinaryInPath('curl');
+
+if (process.env.CI === 'true') {
+    console.log('- Downloading mod dll');
+    if (curlCLI) {
+        const dll = join(managerModDir, 'PTCGLiveZhMod.dll');
+        const curl = spawnSync(curlCLI, [
+            '--connect-timeout',
+            '3',
+            '--fail',
+            '--location',
+            '--output',
+            dll + '.tmp',
+            'https://github.com/Hill-98/ptcg-live-zh-mod/releases/latest/download/PTCGLiveZhMod.dll',
+        ], { ...spawnOptions, cwd: modDir });
+        assert(curl.status === 0, 'An error occurred while Downloading the mod dll.');
+        fs.renameSync(dll + '.tmp', dll);
+    } else {
+        console.log('* curl does not exist, skip downloading.');
+    }
 }
 
 if (isWindows) {
@@ -109,7 +118,6 @@ console.log('- Building localization files');
 });
 
 console.log('- Downloading BepInEx');
-const curlCLI = findBinaryInPath('curl');
 const downloadUrls = {
     'BepInEx_unix_5.4.22.0.zip': 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.22/BepInEx_unix_5.4.22.0.zip',
     'BepInEx_x64_5.4.22.0.zip': 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.22/BepInEx_x64_5.4.22.0.zip',
