@@ -231,7 +231,7 @@ const main = async function main() {
         if (select) {
             try {
                 if (!await PTCGLUtility.selectDirectory()) {
-                    await showQuitAlert('你选择不是 Pokémon TCG Live 安装目录');
+                    await showQuitAlert('你选择的不是 Pokémon TCG Live 安装目录');
                     return;
                 }
             } catch (err) {
