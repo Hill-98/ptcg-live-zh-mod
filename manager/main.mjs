@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, Menu, shell } from 'electron';
+import { app, BrowserWindow, dialog, Menu, nativeTheme, shell } from 'electron';
 import { join, normalize } from 'node:path';
 import { isOSX, isWindows, isWindows11 } from './js-node/isOS.mjs';
 import { extract as TarExtract, list as TarList } from 'tar';
@@ -10,6 +10,9 @@ import isDev from 'electron-is-dev';
 import { processWrapper as processIpcWrapper, wrapper as ipcWrapper } from './js-node/ipcUtils.mjs';
 import PTCGLUtility from './js-node/utils/PTCGLUtility.mjs';
 import SelectDirectory from './js-node/utils/selectDirectory.mjs';
+
+const DARK_BACKGROUND_COLOR = '#2f3542';
+const LIGHT_BACKGROUND_COLOR = '#f3f3f3';
 
 const APP_FILES_DIR = join(AppUnpackPath, 'files');
 const OSX_SHORTCUT = join(app.getPath('desktop'), 'PTCGL 中文版.app');
@@ -25,7 +28,6 @@ const createMainWindow = async function createMainWindow() {
     const mainWindow = new BrowserWindow({
         title: app.getName(),
         icon: join(app.getAppPath(), 'icons', isWindows ? 'app.ico' : 'app.png'),
-        backgroundColor: isWindows11 ? undefined : '#f3f3f3',
         backgroundMaterial: isWindows11 ? 'mica' : 'auto',
         width: 600,
         height: 400,
@@ -38,7 +40,19 @@ const createMainWindow = async function createMainWindow() {
         },
     });
 
+    const toggleBackgroundColor = function toggleBackgroundColor() {
+        mainWindow.setBackgroundColor(nativeTheme.shouldUseDarkColors ? DARK_BACKGROUND_COLOR : LIGHT_BACKGROUND_COLOR);
+    };
+
     mainWindow.once('ready-to-show', () => {
+        if (!isWindows11) {
+            toggleBackgroundColor();
+            nativeTheme.on('updated', toggleBackgroundColor);
+            mainWindow.once('closed', () => {
+                nativeTheme.off('updated', toggleBackgroundColor);
+            });
+        }
+
         mainWindow.show();
 
         if (isDev) {
@@ -162,7 +176,7 @@ const installPlugin = async function installPlugin() {
         await b.install();
     }
 
-    if (!fs.existsSync(OSX_SHORTCUT)) {
+    if (isOSX && !fs.existsSync(OSX_SHORTCUT)) {
         fs.symlinkSync(PTCGL_INSTALL_DIR, OSX_SHORTCUT);
     }
 
@@ -236,7 +250,10 @@ const uninstallPlugin = function (withBepInEx) {
             }
         }
     }
-    fs.rmSync(OSX_SHORTCUT, { force: true });
+
+    if (isOSX) {
+        fs.rmSync(OSX_SHORTCUT, { force: true });
+    }
 };
 
 process.on('uncaughtException', (err) => {

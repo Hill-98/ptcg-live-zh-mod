@@ -134,10 +134,6 @@ button[disabled] {
     display: none;
 }
 
-#title {
-    color: #014A8E;
-}
-
 #uninstall-button {
     background-color: #ff6b81;
 }
