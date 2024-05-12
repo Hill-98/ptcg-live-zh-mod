@@ -1,4 +1,5 @@
 import { app, BrowserWindow, dialog, Menu, nativeTheme, shell } from 'electron';
+import { createHash } from 'node:crypto'
 import { join, normalize } from 'node:path';
 import { isOSX, isWindows, isWindows11 } from './js-node/isOS.mjs';
 import { extract as TarExtract, list as TarList } from 'tar';
@@ -23,6 +24,29 @@ let PTCGL_ROOT_INSTALL_DIR = '';
 
 /** @type {BepInExManager|null} */
 let BepInEx = null;
+
+const checkFilesHash = function checkFilesHash() {
+    const checksumsFile = join(app.getAppPath(), 'checksums.json');
+    if (!fs.existsSync(checksumsFile)) {
+        throw new Error('checksums file does not exist');
+    }
+
+    const checksums = JSON.parse(fs.readFileSync(checksumsFile, { encoding: 'utf8' }));
+    checksums.forEach((item) => {
+        const fullPathWithApp = join(app.getAppPath(), item.path);
+        const fullPathWithAppUnpack = join(AppUnpackPath, item.path);
+        const path = fs.existsSync(fullPathWithApp)
+            ? fullPathWithApp
+            : (fs.existsSync(fullPathWithAppUnpack) ? fullPathWithAppUnpack : null);
+        if (path === null) {
+            throw new Error(`'${item.path}' not found.`);
+        }
+        const hash = createHash('sha1').update(fs.readFileSync(path)).digest('hex');
+        if (hash !== item.hash) {
+            throw new Error(`'${item.path}' checksum mismatch.\nexpect: ${item.hash}\nobtain: ${hash}`);
+        }
+    });
+};
 
 const createMainWindow = async function createMainWindow() {
     const mainWindow = new BrowserWindow({
@@ -275,12 +299,26 @@ if (!app.requestSingleInstanceLock()) {
 
 Menu.setApplicationMenu(null);
 BepInExManager.setBepInExPackage({
-    BepInEx: join(APP_FILES_DIR, isWindows ? 'BepInEx_x64_5.4.22.0.zip' : 'BepInEx_unix_5.4.22.0.zip'),
-    OSXLoader: join(APP_FILES_DIR, 'BepInExOSXLoader/Tobey.BepInEx.Bootstrap.dll'),
-    OSXLoaderCore: join(APP_FILES_DIR, 'BepInExOSXLoader/UnityEngine.CoreModule.dll'),
+    BepInEx: join(APP_FILES_DIR, 'BepInEx_5.4.22.0.zip'),
+    OSXLoader: isOSX ? join(APP_FILES_DIR, 'BepInExOSXLoader/Tobey.BepInEx.Bootstrap.dll') : null,
+    OSXLoaderCore: isOSX ? join(APP_FILES_DIR, 'BepInExOSXLoader/UnityEngine.CoreModule.dll') : null,
 });
 
 app.whenReady().then(() => {
+    if (app.isPackaged) {
+        try {
+            checkFilesHash();
+        } catch (err) {
+            dialog.showMessageBoxSync({
+                title: app.getName(),
+                type: 'error',
+                message: '校验文件时发生错误：' + err.message,
+            });
+            app.quit();
+            return;
+        }
+    }
+
     createMainWindow();
 
     app.on('activate', () => {

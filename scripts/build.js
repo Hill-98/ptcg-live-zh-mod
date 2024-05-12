@@ -5,6 +5,7 @@ const assert = require('assert');
 const fs = require('fs');
 
 const ROOT_DIR = dirname(__dirname);
+const isOSX = process.platform === 'darwin';
 const isWindows = process.platform === 'win32';
 
 const findBinaryInPath = function findBinaryInPath(name) {
@@ -119,37 +120,36 @@ console.log('- Building localization files');
 });
 
 console.log('- Downloading BepInEx');
-const downloadUrls = {
-    'BepInEx_unix_5.4.22.0.zip': 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.22/BepInEx_unix_5.4.22.0.zip',
-    'BepInEx_x64_5.4.22.0.zip': 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.22/BepInEx_x64_5.4.22.0.zip',
-};
-Object.keys(downloadUrls).forEach((file) => {
-    const BepInExZip = join(managerFilesDir, file);
-    if (fs.existsSync(BepInExZip)) {
-        console.log('- ' + basename(BepInExZip) + ' already exists, skip downloading.');
-    } else if (curlCLI) {
-        const curl = spawnSync(curlCLI, [
-            '--connect-timeout',
-            '3',
-            '--fail',
-            '--location',
-            '--output',
-            BepInExZip + '.tmp',
-            downloadUrls[file],
-        ], spawnOptions);
-        assert(curl.status === 0, 'An error occurred while downloading BepInEx.');
-        fs.renameSync(BepInExZip + '.tmp', BepInExZip);
-    } else {
-        console.log('* curl does not exist, skip downloading.');
-    }
-});
+const BepInExZipUrl = isWindows
+    ? 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.22/BepInEx_x64_5.4.22.0.zip'
+    : 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.22/BepInEx_unix_5.4.22.0.zip';
+const BepInExZip = join(managerFilesDir, 'BepInEx_5.4.22.0.zip');
+if (fs.existsSync(BepInExZip)) {
+    console.log('- ' + basename(BepInExZip) + ' already exists, skip downloading.');
+} else if (curlCLI) {
+    const curl = spawnSync(curlCLI, [
+        '--connect-timeout',
+        '3',
+        '--fail',
+        '--location',
+        '--output',
+        BepInExZip + '.tmp',
+        BepInExZipUrl,
+    ], spawnOptions);
+    assert(curl.status === 0, 'An error occurred while downloading BepInEx.');
+    fs.renameSync(BepInExZip + '.tmp', BepInExZip);
+} else {
+    console.log('* curl does not exist, skip downloading.');
+}
 
 console.log('- Copy files to manager');
 const fontFileName = 'NotoSansSC_sdf32_optimized_12k_lzma_2019';
-fs.rmSync(join(managerFilesDir, 'BepInExOSXLoader'), { force: true, recursive: true });
-fs.cpSync(join(ROOT_DIR, 'BepInExOSXLoader'), join(managerFilesDir, 'BepInExOSXLoader'), { recursive: true });
+if (isOSX) {
+    fs.rmSync(join(managerFilesDir, 'BepInExOSXLoader'), { force: true, recursive: true });
+    fs.cpSync(join(ROOT_DIR, 'BepInExOSXLoader'), join(managerFilesDir, 'BepInExOSXLoader'), { recursive: true });
+}
 fs.cpSync(
-    join(ROOT_DIR, `fonts/${fontFileName + (process.platform === 'win32' ? '_windows' : '_macos') + '.asset'}`),
+    join(ROOT_DIR, `fonts/${fontFileName + (isWindows ? '_windows' : '_macos') + '.asset'}`),
     join(managerModDir, `fonts/${fontFileName}`),
     { recursive: true }
 );

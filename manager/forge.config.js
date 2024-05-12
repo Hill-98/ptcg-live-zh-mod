@@ -1,11 +1,12 @@
 const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const { createHash } = require('node:crypto');
 const { join, parse } = require('node:path');
 const fs = require('node:fs');
 const info = require('./package.json');
 
 const KEEP_LANGUAGES = ['en', 'en-US', 'zh_CN', 'zh-CN', 'zh_TW', 'zh-TW'];
-const NO_ASAR = process.env.NO_ASAR === 'yes';
+const NO_ASAR = ['yes', 'true'].includes(process.env.NO_ASAR ?? 'x');
 
 const deleteUselessLanguageFile = function deleteUselessLanguageFile(ext, item) {
     const fullPath = join(item.path, item.name);
@@ -46,14 +47,20 @@ const config = {
         }),
     ],
     hooks: {
-        generateAssets() {
+        packageAfterCopy(config, buildPath) {
+            const checksums = fs.readdirSync(buildPath, { recursive: true })
+                .map((path) => path.replaceAll('\\', '/'))
+                .filter((path) => path.startsWith('files/') && !path.endsWith('/.gitignore') && fs.statSync(join(buildPath, path)).isFile())
+                .map((path) => ({
+                    path,
+                    hash: createHash('sha1').update(fs.readFileSync(join(buildPath, path))).digest('hex'),
+                }));
+            fs.writeFileSync(join(buildPath, 'checksums.json'), JSON.stringify(checksums), { encoding: 'utf8' });
         },
         postPackage(config, packageResult) {
             const outPath = packageResult.outputPaths[0];
             const contentsPath = packageResult.platform === 'darwin' ? join(outPath, (config.packagerConfig.name || info.name) + '.app', 'Contents') : outPath;
             const resourcesPath = join(contentsPath, 'Resources');
-            const appAsarUnpackedPath = join(resourcesPath, NO_ASAR ? 'app' : 'app.asar.unpacked');
-            const appFilesPath = join(appAsarUnpackedPath, 'files');
 
             fs.renameSync(join(outPath, 'LICENSE'), join(outPath, 'LICENSE.electron.txt'));
             fs.copyFileSync(join(__dirname, '..', 'LICENSE'), join(outPath, 'LICENSE.txt'));
@@ -63,14 +70,12 @@ const config = {
                     ...fs.readdirSync(join(contentsPath, 'Frameworks/Electron Framework.framework/Versions/Current/Resources'), { withFileTypes: true }),
                     ...fs.readdirSync(resourcesPath, { withFileTypes: true }),
                 ].forEach(deleteUselessLanguageFile.bind(this, 'lproj'));
-                fs.rmSync(join(appFilesPath, 'BepInEx_x64_5.4.22.0.zip'));
             } else if (packageResult.platform === 'win32') {
-                fs.readdirSync(join(outPath, 'locales'), { withFileTypes: true }).forEach(deleteUselessLanguageFile.bind(this, 'pak'));
-                fs.rmSync(join(appFilesPath, 'BepInExOSXLoader'), { recursive: true });
-                fs.rmSync(join(appFilesPath, 'BepInEx_unix_5.4.22.0.zip'));
+                fs.readdirSync(join(outPath, 'locales'), { withFileTypes: true })
+                    .forEach(deleteUselessLanguageFile.bind(this, 'pak'));
             }
-        }
-    }
+        },
+    },
 };
 
 module.exports = config;
