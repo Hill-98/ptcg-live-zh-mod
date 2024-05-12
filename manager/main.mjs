@@ -10,7 +10,7 @@ import fs from 'node:fs';
 import isDev from 'electron-is-dev';
 import { processWrapper as processIpcWrapper, wrapper as ipcWrapper } from './js-node/ipcUtils.mjs';
 import PTCGLUtility from './js-node/utils/PTCGLUtility.mjs';
-import SelectDirectory from './js-node/utils/selectDirectory.mjs';
+import { SelectDirectory, SelectFile } from './js-node/utils/SelectDialog.mjs';
 
 const DARK_BACKGROUND_COLOR = '#2f3542';
 const LIGHT_BACKGROUND_COLOR = '#f3f3f3';
@@ -139,9 +139,9 @@ const installAssets = async function installAssets(ev) {
         throw new Error ('assets dir is null.');
     }
 
-    const dialogResult = dialog.showOpenDialogSync(BrowserWindow.fromId(ev.frameId), {
+    const file = await SelectFile({
         title: '选择中文化卡牌图片资源包',
-        defaultPath: app.getPath('downloads'),
+        defaultPath: '~downloads',
         filters: [
             {
                 name: '中文化卡牌图片资源包',
@@ -149,20 +149,20 @@ const installAssets = async function installAssets(ev) {
             },
         ],
     });
-    if (!dialogResult) {
+    if (!file) {
         return;
     }
 
-    const file = dialogResult.shift();
     const ipc = processIpcWrapper('installAssets', ev.sender, 1000);
-    let totalEntryCount = 0;
     let extractedEntryCount = 0;
+    let totalEntryCount = 0;
 
     if (!fs.existsSync(assetsDir)) {
         fs.mkdirSync(assetsDir);
     }
 
     ipc.emit('x');
+    // noinspection SpellCheckingInspection
     await TarList({
         file,
         onentry() {
@@ -170,7 +170,7 @@ const installAssets = async function installAssets(ev) {
         },
         onwarn: console.warn,
     });
-
+    // noinspection SpellCheckingInspection
     await TarExtract({
         chmod: false,
         cwd: assetsDir,
@@ -212,8 +212,8 @@ const pluginInstalled = function pluginInstalled() {
     return b?.isInstalled() && b?.pluginInstalled(PLUGIN_NAME);
 };
 
-const selectDirectory = function selectDirectory(ev) {
-    const dir = SelectDirectory({
+const selectDirectory = async function selectDirectory(ev) {
+    const dir = await SelectDirectory({
         title: '选择 Pokémon TCG Live 安装目录',
         defaultPath: '~desktop',
         filters: [
