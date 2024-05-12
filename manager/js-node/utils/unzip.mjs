@@ -1,6 +1,6 @@
+import { dirname, join, normalize } from 'node:path';
 import { open } from 'yauzl';
-import { dirname, join, normalize } from 'path';
-import fs from 'fs';
+import fs from 'node:fs';
 
 const extractFile = function extractFile(entry, output) {
     return new Promise((resolve, reject) => {

@@ -1,9 +1,9 @@
 import { join } from 'node:path';
 import { isOSX, isWindows } from '../isOS.mjs';
-import AppUnpackPath from '../AppUnpackPath.mjs';
-import Command from '../lib/Command.mjs';
 import fs from 'node:fs';
 import plist from 'plist';
+import AppUnpackPath from '../AppUnpackPath.mjs';
+import Command from '../lib/Command.mjs';
 import versionParse from './versionParse.mjs';
 
 const WINDOWS_PTCGL_UTILITY = join(AppUnpackPath, 'bin/NeuExt.PTCGLUtility.exe');

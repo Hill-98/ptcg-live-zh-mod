@@ -1,16 +1,16 @@
 import { app, BrowserWindow, dialog, Menu, nativeTheme, shell } from 'electron';
 import { createHash } from 'node:crypto'
 import { join, normalize } from 'node:path';
-import { isOSX, isWindows, isWindows11 } from './js-node/isOS.mjs';
 import { extract as TarExtract, list as TarList } from 'tar';
+import { processWrapper as processIpcWrapper, wrapper as ipcWrapper } from './js-node/ipcUtils.mjs';
+import { isOSX, isWindows, isWindows11 } from './js-node/isOS.mjs';
+import { SelectDirectory, SelectFile } from './js-node/utils/SelectDialog.mjs';
+import cfv from 'cfv';
+import isDev from 'electron-is-dev';
+import fs from 'node:fs';
 import AppUnpackPath from './js-node/AppUnpackPath.mjs';
 import BepInExManager from './js-node/lib/BepInExManager.mjs';
-import cfv from 'cfv';
-import fs from 'node:fs';
-import isDev from 'electron-is-dev';
-import { processWrapper as processIpcWrapper, wrapper as ipcWrapper } from './js-node/ipcUtils.mjs';
 import PTCGLUtility from './js-node/utils/PTCGLUtility.mjs';
-import { SelectDirectory, SelectFile } from './js-node/utils/SelectDialog.mjs';
 
 const DARK_BACKGROUND_COLOR = '#2f3542';
 const LIGHT_BACKGROUND_COLOR = '#f3f3f3';

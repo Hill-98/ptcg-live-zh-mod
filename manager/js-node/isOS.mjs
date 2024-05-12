@@ -1,4 +1,5 @@
 import { release } from 'node:os';
+
 const versions = release().split('.').map((v) => Number.parseInt(v)).map((v) => Number.isNaN(v) ? 0 : v);
 
 export const isLinux = process.platform === 'linux';
