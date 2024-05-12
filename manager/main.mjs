@@ -100,9 +100,11 @@ const detectPTCGLInstallDirectory = function detectPTCGLInstallDirectory() {
 };
 
 const getAssetsInstallDir = function () {
-    const b = getBepInExManager();
-    const pluginDir = b?.getPluginDir(PLUGIN_NAME);
-    return pluginDir ? join(pluginDir, 'assets') : null;
+    try {
+        return join(getPluginDir(), 'assets');
+    } catch {
+    }
+    return null;
 };
 
 const getAssetsInstalledVersion = function () {
@@ -127,10 +129,16 @@ const getBepInExManager = function getBepInExManager() {
     return BepInEx;
 };
 
-const getPluginSwitchState = function () {
+const getPluginDir = function getPluginDir() {
     const pluginDir = getBepInExManager()?.getPluginDir(PLUGIN_NAME);
-    const file = join(pluginDir ?? 'x', 'disabled');
-    return pluginDir !== null && fs.existsSync(file);
+    if (!pluginDir) {
+        throw new Error('plugin dir is null.');
+    }
+    return pluginDir;
+};
+
+const getPluginSwitchState = function () {
+    return fs.existsSync(join(getPluginDir(), 'disabled'));
 };
 
 const installAssets = async function installAssets(ev) {
@@ -245,16 +253,11 @@ const setPTCGLDirectory = function setPTCGLDirectory(dir) {
 };
 
 const switchPlugin = function (disable) {
-    const pluginDir = getBepInExManager()?.getPluginDir(PLUGIN_NAME);
-    if (pluginDir === null) {
-        throw new Error('plugin dir is null.');
-    }
-
-    const file = join(pluginDir, 'disabled');
+    const file = join(getPluginDir(), 'disabled');
     if (disable) {
         fs.writeFileSync(file, 'disabled');
     } else {
-        fs.rmSync(file, { force: true });
+        fs.rmSync(file, { force: true, recursive: true });
     }
 };
 
