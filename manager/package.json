@@ -1,7 +1,7 @@
 {
   "name": "ptcgl-zh-mod-manager",
   "productName": "PTCGL 中文化模组管理器",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "PTCGL 中文化模组管理器",
   "main": "main.mjs",
   "homepage": "https://github.com/Hill-98/ptcg-live-zh-mod",
