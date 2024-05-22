@@ -118,11 +118,15 @@ const getAssetsInstalledVersion = function () {
     return Number.isNaN(v) ? null : v;
 };
 
-const getBepInExManager = function getBepInExManager() {
+const getBepInExManager = function getBepInExManager(nullThrow = false) {
     if (BepInEx === null) {
         try {
             BepInEx = new BepInExManager(PTCGL_ROOT_INSTALL_DIR, PTCGL_INSTALL_DIR);
         } catch {
+            BepInEx = null;
+            if (nullThrow) {
+                throw new Error('BepInExManager is null');
+            }
             return null;
         }
     }
@@ -144,7 +148,7 @@ const getPluginSwitchState = function () {
 const installAssets = async function installAssets(ev) {
     const assetsDir = getAssetsInstallDir();
     if (assetsDir === null) {
-        throw new Error ('assets dir is null.');
+        throw new Error('assets dir is null.');
     }
 
     const file = await SelectFile({
@@ -192,18 +196,12 @@ const installAssets = async function installAssets(ev) {
 };
 
 const installPlugin = async function installPlugin() {
-    if (isOSX) {
-        if (!PTCGLUtility.SyncGameVersion(PTCGL_INSTALL_DIR)) {
-            throw new Error('SyncGameVersion is failed.');
-        }
-    }
-    const b = getBepInExManager();
-    if (b === null) {
-        throw new Error('BepInExManager is null.');
+    if (isOSX && !PTCGLUtility.SyncGameVersion(PTCGL_INSTALL_DIR)) {
+        throw new Error('SyncGameVersion is failed.');
     }
 
+    const b = getBepInExManager(true);
     b.uninstallPlugin('ptcg-live-zh-mod');
-
     if (!b.isInstalled() || await b.isUpdatable()) {
         await b.install();
     }
@@ -262,10 +260,7 @@ const switchPlugin = function (disable) {
 };
 
 const uninstallPlugin = function (withBepInEx) {
-    const b = getBepInExManager();
-    if (b === null) {
-        throw new Error('BepInExManager is null.');
-    }
+    const b = getBepInExManager(true);
 
     b.uninstallPlugin(PLUGIN_NAME);
     if (withBepInEx) {
