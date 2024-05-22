@@ -17,6 +17,7 @@ const LIGHT_BACKGROUND_COLOR = '#f3f3f3';
 
 const APP_FILES_DIR = join(AppUnpackPath, 'files');
 const OSX_SHORTCUT = join(app.getPath('desktop'), 'PTCGL 中文版.app');
+const NO_WINDOW_EFFECT = !isWindows11 || process.argv.includes('--no-window-effect');
 const PLUGIN_NAME = 'PTCGLiveZhMod';
 
 let PTCGL_INSTALL_DIR = '';
@@ -52,14 +53,13 @@ const createMainWindow = async function createMainWindow() {
     const mainWindow = new BrowserWindow({
         title: app.getName(),
         icon: join(app.getAppPath(), 'icons', isWindows ? 'app.ico' : 'app.png'),
-        backgroundMaterial: isWindows11 ? 'mica' : 'auto',
+        backgroundMaterial: NO_WINDOW_EFFECT ? 'none' : 'mica',
         width: 600,
         height: 400,
         resizable: false,
         show: false,
         useContentSize: true,
         webPreferences: {
-            defaultFontFamily: {},
             preload: join(app.getAppPath(), 'preload.js'),
         },
     });
@@ -69,7 +69,7 @@ const createMainWindow = async function createMainWindow() {
     };
 
     mainWindow.once('ready-to-show', () => {
-        if (!isWindows11) {
+        if (NO_WINDOW_EFFECT) {
             toggleBackgroundColor();
             nativeTheme.on('updated', toggleBackgroundColor);
             mainWindow.once('closed', () => {
