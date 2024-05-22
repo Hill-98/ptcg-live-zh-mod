@@ -1,9 +1,9 @@
-const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
+const { FusesPlugin } = require('@electron-forge/plugin-fuses');
 const { createHash } = require('node:crypto');
 const { join, parse } = require('node:path');
 const fs = require('node:fs');
-const info = require('./package.json');
+const pkg = require('./package.json');
 
 const KEEP_LANGUAGES = ['en', 'en-US', 'zh_CN', 'zh-CN', 'zh_TW', 'zh-TW'];
 const NO_ASAR = ['yes', 'true'].includes(process.env.NO_ASAR ?? 'x');
@@ -15,17 +15,18 @@ const deleteUselessLanguageFile = function deleteUselessLanguageFile(ext, item) 
         fs.rmSync(fullPath, { recursive: true });
     }
 };
+const unpackDirs = ['bin', 'files'];
 
 /** @type {ForgeConfig} */
 const config = {
     packagerConfig: {
-        appBundleId: info.name,
+        appBundleId: pkg.name,
         appCopyright: 'Copyright (c) 2024 Hill-98@GitHub',
-        appVersion: info.version,
-        icon: __dirname + '/icons/app',
-        name: info.productName,
+        appVersion: pkg.version,
+        icon: join(__dirname, 'icons/app'),
+        name: pkg.productName,
         asar: NO_ASAR ? false : {
-            unpack: join('**', '{bin,files}', '**'),
+            unpack: join('**', `{${unpackDirs.join(',')}}`, '**'),
         },
     },
     rebuildConfig: {},
@@ -47,10 +48,17 @@ const config = {
         }),
     ],
     hooks: {
-        packageAfterCopy(config, buildPath) {
+        packageAfterPrune(config, buildPath) {
             const checksums = fs.readdirSync(buildPath, { recursive: true })
                 .map((path) => path.replaceAll('\\', '/'))
-                .filter((path) => path.startsWith('files/') && !path.endsWith('/.gitignore') && fs.statSync(join(buildPath, path)).isFile())
+                .filter((path) => fs.statSync(join(buildPath, path)).isFile())
+                .filter((path) => {
+                    if (path.match(/\/\.gitignore$/)) {
+                        fs.rmSync(join(buildPath, path));
+                        return false;
+                    }
+                    return unpackDirs.find((dir) => path.startsWith(`${dir}/`));
+                })
                 .map((path) => ({
                     path,
                     hash: createHash('sha1').update(fs.readFileSync(join(buildPath, path))).digest('hex'),
@@ -59,7 +67,7 @@ const config = {
         },
         postPackage(config, packageResult) {
             const outPath = packageResult.outputPaths[0];
-            const contentsPath = packageResult.platform === 'darwin' ? join(outPath, (config.packagerConfig.name || info.name) + '.app', 'Contents') : outPath;
+            const contentsPath = packageResult.platform === 'darwin' ? join(outPath, (config.packagerConfig.name || pkg.name) + '.app', 'Contents') : outPath;
             const resourcesPath = join(contentsPath, 'Resources');
 
             fs.renameSync(join(outPath, 'LICENSE'), join(outPath, 'LICENSE.electron.txt'));
