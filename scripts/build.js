@@ -4,9 +4,10 @@ const { basename, dirname, join, parse } = require('path');
 const assert = require('assert');
 const fs = require('fs');
 
+const platform = process.env['BUILD_PLATFORM'] ?? process.platform;
 const ROOT_DIR = dirname(__dirname);
-const isOSX = process.platform === 'darwin';
-const isWindows = process.platform === 'win32';
+const isOSX = platform === 'darwin';
+const isWindows = platform === 'win32';
 
 const findBinaryInPath = function findBinaryInPath(name) {
     const env = process.env['PATH'] ?? process.env['path'];
@@ -55,11 +56,11 @@ if (fs.existsSync(managerModDir)) {
 fs.mkdirSync(managerModDir);
 
 const curlCLI = findBinaryInPath('curl');
+const dll = join(managerModDir, 'PTCGLiveZhMod.dll');
 
 if (process.env.CI === 'true') {
     console.log('- Downloading mod dll');
     if (curlCLI) {
-        const dll = join(managerModDir, 'PTCGLiveZhMod.dll');
         const curl = spawnSync(curlCLI, [
             '--connect-timeout',
             '3',
@@ -74,6 +75,9 @@ if (process.env.CI === 'true') {
     } else {
         console.log('* curl does not exist, skip downloading.');
     }
+} else {
+    console.log('- Copy mod dll');
+    fs.cpSync(join(ROOT_DIR, 'dist/PTCGLiveZhMod.dll'), dll);
 }
 
 if (isWindows) {
@@ -164,6 +168,8 @@ if (npmCLI || yarnCLI) {
     const nCLI = spawnSync(cli, [
         'run',
         'make',
+        '--platform',
+        platform,
     ], { ...spawnOptions, cwd: managerDir });
     assert(nCLI.status === 0, 'An error occurred while building the mod manager.');
 } else {
