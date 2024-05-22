@@ -156,7 +156,7 @@ const installAssets = async function installAssets(ev) {
                 extensions: ['assets.tar.br'],
             },
         ],
-    });
+    }, BrowserWindow.fromWebContents(ev.sender));
     if (!file) {
         return;
     }
@@ -230,7 +230,7 @@ const selectDirectory = async function selectDirectory(ev) {
                 extensions: ['exe'],
             },
         ],
-    }, BrowserWindow.fromId(ev.frameId));
+    }, BrowserWindow.fromWebContents(ev.sender));
     if (!dir || !PTCGLUtility.isPTCGLInstallDirectory(dir)) {
         return false;
     }
