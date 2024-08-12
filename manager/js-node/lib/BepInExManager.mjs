@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os';
 import { join, normalize, parse } from 'node:path';
 import { isOSX } from '../isOS.mjs';
@@ -198,7 +199,9 @@ export default class BepInExManager {
 
     #OSXLoaderPatched() {
         try {
-            return fs.readFileSync(this.#OSXLoaderCorePath, { encoding: 'ascii' }).includes('Tobey.BepInEx.Bootstrap');
+            const core = fs.readFileSync(this.#OSXLoaderCorePath)
+            const loaderCore = fs.readFileSync(OSXLoaderCore)
+            return createHash('md5').update(core).digest('hex') === createHash('md5').update(loaderCore).digest('hex');
         } catch {
             return false;
         }
