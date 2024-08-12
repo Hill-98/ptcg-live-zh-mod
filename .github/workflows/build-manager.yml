@@ -10,7 +10,7 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: '20.11.1'
+          node-version: '20.15.1'
       - name: Check out code
         uses: actions/checkout@v4
         with:
@@ -30,13 +30,12 @@ jobs:
       - name: Setup NodeJS
         uses: actions/setup-node@v4
         with:
-          node-version: '20.11.1'
+          node-version: '20.15.1'
       - name: Setup msbuild
         uses: microsoft/setup-msbuild@v2
       - name: Check out code
         uses: actions/checkout@v4
         with:
-          lfs: true
           submodules: true
       - name: Build
         run: node ./scripts/build.js
