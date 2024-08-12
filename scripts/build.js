@@ -119,7 +119,7 @@ console.log('- Building localization files');
 
     for (const key in textMap) {
         const text = textMap[key];
-        fs.appendFileSync(outputFile, key + ':' + text + '\n', { encoding: 'utf8' });
+        fs.appendFileSync(outputFile, `|${key}:${text.trimEnd()}\n`, { encoding: 'utf8' });
     }
 });
 

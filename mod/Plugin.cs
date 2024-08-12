@@ -1,6 +1,5 @@
 using BepInEx;
 using BepInEx.Logging;
-using CardDatabase.DataAccess;
 using HarmonyLib;
 using PTCGLiveZhMod.Patches;
 using System;
@@ -168,20 +167,28 @@ namespace PTCGLiveZhMod
             }
             try
             {
-                var lines = File.ReadAllLines(file);
+                var lines = File.ReadAllText(file).Split('\n');
+                var key = string.Empty;
+                var value = string.Empty;
                 foreach (var line in lines)
                 {
+                    if (line.StartsWith("|") && !string.IsNullOrWhiteSpace(key) && !string.IsNullOrWhiteSpace(value))
+                    {
+                        dict[key] = value.Trim();
+                        key = string.Empty;
+                        value = string.Empty;
+                    }
                     var i = line.IndexOf(':');
-                    if (i <= 0 || line.StartsWith("#"))
+                    if (i != -1 && line.StartsWith("|"))
                     {
-                        continue;
-                    }
-                    var key = line.Substring(0, i);
-                    var text = line.Substring(i + 1);
-                    if (!dict.ContainsKey(key))
+                        key = line.Substring(1, i - 1);
+                        value += line.Substring(i + 1);
+                    } else
                     {
-                        dict.Add(key.Trim(), text.Trim());
+                        value += line;
                     }
+                    value += "\n";
+
                 }
             }
             catch (Exception ex)
