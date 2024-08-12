@@ -1,4 +1,2 @@
 *.bat text eol=crlf
 *.ps1 text eol=crlf
-*.asset filter=lfs diff=lfs merge=lfs -text
-*.dll filter=lfs diff=lfs merge=lfs -text
