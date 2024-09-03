@@ -11,7 +11,7 @@ import versions from './utils/versions.js';
 import versionParse from '../js-node/utils/versionParse.mjs';
 
 const TERMS_OF_USE_VERSION = 2024050901;
-const ASSETS_VERSION = 2024032201;
+const ASSETS_VERSION = 2024081301;
 
 const INSTALL_BUTTON = document.getElementById('install-button');
 const UNINSTALL_BUTTON = document.getElementById('uninstall-button');

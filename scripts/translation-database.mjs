@@ -22,7 +22,7 @@ const databasesUntranslated = JSON.parse(readFile(join(process.cwd(), 'databases
 const databasesTranslated = exists(databasesTranslatedFile) ? JSON.parse(readFile(databasesTranslatedFile), { encoding: 'utf8' }) : {};
 /** @type {Map<string, string>} */
 const dictionary = new Map();
-const dictionaryJSON = require('../dictionary.json');
+const dictionaryJSON = JSON.parse(readFile('dictionary.json', { encoding: 'utf-8' }));
 
 Object.keys(dictionaryJSON).forEach((k) => {
     dictionary.set(k, dictionaryJSON[k]);
