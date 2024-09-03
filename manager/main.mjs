@@ -179,7 +179,10 @@ const installAssets = async function installAssets(ev) {
         throw new Error('assets dir is null.');
     }
 
-    const file = await SelectFile({
+    /**
+     * @type {string}
+     */
+    const file = SelectFile({
         title: '选择中文化卡牌图片资源包',
         defaultPath: '~downloads',
         filters: [
@@ -246,8 +249,8 @@ const pluginInstalled = function pluginInstalled() {
     return b?.isInstalled() && b?.pluginInstalled(PLUGIN_NAME);
 };
 
-const selectDirectory = async function selectDirectory(ev) {
-    const dir = await SelectDirectory({
+const selectDirectory = function selectDirectory(ev) {
+    const dir = SelectDirectory({
         title: '选择 Pokémon TCG Live 安装目录',
         defaultPath: '~desktop',
         filters: [

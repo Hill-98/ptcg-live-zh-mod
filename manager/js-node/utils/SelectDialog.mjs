@@ -21,32 +21,26 @@ const parseOptions = function parseOptions(options) {
     return opts;
 };
 
-export const SelectDirectory = async function SelectDirectory(options, window) {
+export const SelectDirectory = function SelectDirectory(options, window) {
     const args = parseArguments(options, window);
     const properties = args.options.properties ?? [];
-    const result = await dialog.showOpenDialog(args.first, args.second);
-    if (result.canceled) {
+    let paths = dialog.showOpenDialogSync(args.first, args.second);
+    if (typeof paths === 'undefined') {
         return null;
     }
-    let paths = result.filePaths;
     if (!properties.includes('openDirectory')) {
         paths = paths.map((v) => dirname(v));
     }
     return properties.includes('multiSelections') ? paths : paths.shift();
 };
 
-export const SelectFile = async function SelectFile(options, window) {
+export const SelectFile = function SelectFile(options, window) {
     const args = parseArguments(options, window);
     const properties = args.options.properties ?? [];
     args.options.properties = properties.filter((v) => v !== 'openDirectory');
-    const result = await dialog.showOpenDialog(args.first, args.second);
-    if (result.canceled) {
+    const paths = dialog.showOpenDialogSync(args.first, args.second);
+    if (typeof paths === 'undefined') {
         return null;
     }
-    return properties.includes('multiSelections') ? result.filePaths : result.filePaths.shift();
+    return properties.includes('multiSelections') ? paths : paths.shift();
 };
-
-export default {
-    SelectDirectory,
-    SelectFile,
-}
