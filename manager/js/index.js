@@ -16,6 +16,7 @@ const ASSETS_VERSION = 2024032201;
 const INSTALL_BUTTON = document.getElementById('install-button');
 const UNINSTALL_BUTTON = document.getElementById('uninstall-button');
 const PLUGIN_SWITCH = document.getElementById('plugin-switch');
+const OFF_CARD_DISPLAY_TEXT = document.getElementById('off-card-text-display');
 const STATUS_TEXT = document.getElementById('status-text');
 
 const enableOrDisableAll = function enableOrDisableAll(enable) {
@@ -23,10 +24,12 @@ const enableOrDisableAll = function enableOrDisableAll(enable) {
         INSTALL_BUTTON.removeAttribute('disabled');
         UNINSTALL_BUTTON.removeAttribute('disabled');
         PLUGIN_SWITCH.removeAttribute('disabled');
+        OFF_CARD_DISPLAY_TEXT.removeAttribute('disabled');
     } else {
         INSTALL_BUTTON.setAttribute('disabled', '');
         UNINSTALL_BUTTON.setAttribute('disabled', '');
         PLUGIN_SWITCH.setAttribute('disabled', '');
+        OFF_CARD_DISPLAY_TEXT.setAttribute('disabled', '');
     }
 };
 
@@ -104,6 +107,14 @@ const onPluginSwitchClick = function handleSwitchEnable() {
     }));
 };
 
+const onOffCardDisplayTextClick = function handleOffCardDisplayTextClick() {
+    plugin.setCardDisplayTextState(this.checked).catch((err) => swal({
+        buttons: swalButtonsOK,
+        icon: 'error',
+        text: '出现错误：' + err.message,
+    }));
+}
+
 const onUninstallButtonClick = function onUninstallButtonClick() {
     enableOrDisableAll(false);
     swal({
@@ -155,15 +166,18 @@ const refreshState = async function refreshState() {
         }
 
         PLUGIN_SWITCH.checked = await plugin.switchState();
+        OFF_CARD_DISPLAY_TEXT.checked = await plugin.getCardDisplayTextState();
     } else {
         INSTALL_BUTTON.textContent = '安装中文化模组';
         UNINSTALL_BUTTON.setAttribute('disabled', '');
         PLUGIN_SWITCH.checked = false;
         PLUGIN_SWITCH.setAttribute('disabled', '');
+        OFF_CARD_DISPLAY_TEXT.checked = false;
+        OFF_CARD_DISPLAY_TEXT.setAttribute('disabled', '');
         installedModVersionText.parentElement.style.display = 'none';
     }
 
-    STATUS_TEXT.textContent = '';
+    STATUS_TEXT.textContent = '准备就绪';
 };
 
 const showQuitAlert = (text) => swal({
@@ -213,12 +227,12 @@ const main = async function main() {
         const dir = await PTCGLUtility.detectPTCGLInstallDirectory() ? await PTCGLUtility.getPTCGLInstallDirectory() : null;
         let select = window.OS.isWindows;
         if (dir === null && !window.OS.isWindows) {
-            await showQuitAlert('未检测到 Pokémon TCG Live 游戏安装目录，请检查游戏是否已安装，或者尝试重新安装游戏。');
+            await showQuitAlert('未找到 Pokémon TCG Live 安装目录，请检查游戏是否已安装，或者尝试重新安装游戏。');
             return;
         }
         if (dir && window.OS.isWindows) {
             const p = document.createElement('p');
-            p.innerHTML = `已检测到 Pokémon TCG Live 安装目录：
+            p.innerHTML = `已找到 Pokémon TCG Live 安装目录：
 <b><a href="open-path://dir/${encodeURIComponent(dir)}" target="_blank" title="打开此目录" rel="external">${dir}</a></b><br>
 是否需要选择其他安装目录？`;
             select = await swal({
@@ -235,7 +249,7 @@ const main = async function main() {
                     return;
                 }
             } catch (err) {
-                await showQuitAlert(`未选择 Pokémon TCG Live 游戏安装目录。\n\n${err.message}`);
+                await showQuitAlert(`未选择 Pokémon TCG Live 安装目录。\n\n${err.message}`);
                 return;
             }
         }
@@ -252,6 +266,7 @@ const main = async function main() {
     INSTALL_BUTTON.addEventListener('click', onInstallButtonClick);
     UNINSTALL_BUTTON.addEventListener('click', onUninstallButtonClick);
     PLUGIN_SWITCH.addEventListener('click', onPluginSwitchClick);
+    OFF_CARD_DISPLAY_TEXT.addEventListener('click', onOffCardDisplayTextClick);
 };
 
 swal.setDefaults({

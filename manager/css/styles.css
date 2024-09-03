@@ -90,15 +90,11 @@ button[disabled] {
 }
 
 #extended-text {
-    margin-top: 12px;
+    margin-top: 24px;
 }
 
-#extended-text p:last-child {
-    margin-bottom: 0;
-}
-
-#extended-text p:first-child {
-    margin-top: 0;
+#extended-text p {
+    margin: 0;
 }
 
 #game-path {

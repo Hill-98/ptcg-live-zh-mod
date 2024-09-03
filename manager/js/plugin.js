@@ -20,14 +20,20 @@ export const onOff = window.ipc.wrapper.bind(this, 'switchPlugin', true);
 
 export const switchState = window.ipc.wrapper.bind(this, 'getPluginSwitchState', true);
 
+export const getCardDisplayTextState = () => window.ipc.wrapper('getCardDisplayTextState', true).then((state) => !state);
+
+export const setCardDisplayTextState = window.ipc.wrapper.bind(this, 'setCardDisplayTextState', true);
+
 export const uninstall = window.ipc.wrapper.bind(this, 'uninstallPlugin', true);
 
 export default {
     getAssetsInstalledVersion,
+    getCardDisplayTextState,
     install,
     installAssets,
     installed,
     onOff,
+    setCardDisplayTextState,
     switchState,
     uninstall,
 };

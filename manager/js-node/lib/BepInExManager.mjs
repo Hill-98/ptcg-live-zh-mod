@@ -71,6 +71,18 @@ export default class BepInExManager {
         });
     }
 
+    getPluginConfig(name) {
+        const path = join(this.#BepInExPaths.config, name + '.cfg');
+        try {
+            const stat = fs.statSync(path);
+            if (stat.isFile()) {
+                return path;
+            }
+        } catch {
+        }
+        return null;
+    }
+
     getPluginDir(name) {
         const dir = join(this.#BepInExPaths.plugins, name);
         try {

@@ -55,7 +55,7 @@ const createMainWindow = async function createMainWindow() {
         icon: join(app.getAppPath(), 'icons', isWindows ? 'app.ico' : 'app.png'),
         backgroundMaterial: NO_WINDOW_EFFECT ? 'none' : 'mica',
         width: 600,
-        height: 400,
+        height: 440,
         resizable: false,
         show: false,
         useContentSize: true,
@@ -132,6 +132,34 @@ const getBepInExManager = function getBepInExManager(nullThrow = false) {
     }
     return BepInEx;
 };
+
+const getCardDisplayTextState = function getCardDisplayTextState() {
+    const path = getBepInExManager()?.getPluginConfig('c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3');
+    if (path) {
+        const config = fs.readFileSync(path, { encoding: 'ascii'});
+        const line = config.split('\n').find((str) => str.trim().includes('EnableCardGraphicText = '))
+        const matches = line.match(/EnableCardGraphicText\s=\s(false|true)/i)
+        if (matches !== null) {
+            return matches[1] === 'true';
+        }
+    }
+    return false;
+}
+
+const setCardDisplayTextState = function setCardDisplayTextState(state) {
+    const path = getBepInExManager()?.getPluginConfig('c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3');
+    if (!path) {
+        throw new Error('未找到配置文件，请在安装汉化后运行一次游戏。');
+    }
+    const config = fs.readFileSync(path, { encoding: 'ascii'});
+    const lines = config.split('\n').map((line) => {
+        if (line.trim().includes('EnableCardGraphicText = ')) {
+            return 'EnableCardGraphicText = ' + (state ? 'false' : 'true');
+        }
+        return line.trim();
+    })
+    fs.writeFileSync(path, lines.join('\r\n'), { encoding: 'ascii'});
+}
 
 const getPluginDir = function getPluginDir() {
     const pluginDir = getBepInExManager()?.getPluginDir(PLUGIN_NAME);
@@ -363,14 +391,16 @@ app.on('window-all-closed', () => {
 ipcWrapper('detectPTCGLInstallDirectory', detectPTCGLInstallDirectory);
 ipcWrapper('getAssetsInstalledVersion', getAssetsInstalledVersion);
 ipcWrapper('getPTCGLInstallDirectory', () => PTCGL_INSTALL_DIR === '' ? null : PTCGL_INSTALL_DIR);
+ipcWrapper('getPluginSwitchState', getPluginSwitchState);
+ipcWrapper('getCardDisplayTextState', getCardDisplayTextState);
 ipcWrapper('installAssets', installAssets, true);
 ipcWrapper('installPlugin', installPlugin);
 ipcWrapper('pluginInstalled', pluginInstalled);
 ipcWrapper('PTCGLUtilityIsAvailable', PTCGLUtility.isAvailable);
 ipcWrapper('PTCGLIsRunning', PTCGLUtility.PTCGLIsRunning);
 ipcWrapper('selectDirectory', selectDirectory, true);
+ipcWrapper('setCardDisplayTextState', setCardDisplayTextState);
 ipcWrapper('switchPlugin', switchPlugin);
-ipcWrapper('getPluginSwitchState', getPluginSwitchState);
 ipcWrapper('uninstallPlugin', uninstallPlugin);
 
 ipcWrapper('versions.manager', () => {
