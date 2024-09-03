@@ -196,6 +196,22 @@ const installAssets = async function installAssets(ev) {
         return;
     }
 
+    if (file.includes('.update.assets.tar.br')) {
+        const matches = file.match(/_(\d+)\.update\.assets\.tar\.br$/);
+        if (matches === null) {
+            throw new Error('update package from version not found.');
+        } else {
+            const assetsVersion = getAssetsInstalledVersion();
+            const updateFromVersion = matches[1];
+            if (assetsVersion === null) {
+                throw new Error('Unable to get current asset version.');
+            }
+            if (assetsVersion >= updateFromVersion) {
+                return
+            }
+        }
+    }
+
     const ipc = processIpcWrapper('installAssets', ev.sender, 1000);
     let extractedEntryCount = 0;
     let totalEntryCount = 0;
