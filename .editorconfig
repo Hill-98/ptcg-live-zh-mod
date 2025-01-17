@@ -8,6 +8,14 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+[{*.ats,*.cts,*.mts,*.ts}]
+indent_size = 2
+tab_width = 2
+
+[{*.cjs,*.js,*.mjs}]
+indent_size = 2
+tab_width = 2
+
 [*.{yml, yaml}]
 indent_size = 2
 
