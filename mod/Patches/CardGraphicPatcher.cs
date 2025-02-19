@@ -2,6 +2,7 @@ using System.Collections;
 using CardDatabase.DataAccess.CardFormat;
 using HarmonyLib;
 using TMPro;
+using TPCI.Rainier.Match.Cards;
 using UnityEngine;
 
 namespace PTCGLiveZhMod.Patches
@@ -119,7 +120,7 @@ namespace PTCGLiveZhMod.Patches
         }
 
         /// <summary>
-        /// 拒绝 Card3DGraphic 不显示文本版本
+        /// 允许 Card3DGraphic 显示文本
         /// </summary>
         [HarmonyPatch(typeof(Card3DGraphic), "LoadTextVersion")]
         [HarmonyPrefix]
