@@ -22,7 +22,7 @@ namespace PTCGLiveZhMod
             DumpAllCards = config.Bind("dump", "DumpAllCards", false);
             DumpAllLocalizationText = config.Bind("dump", "DumpAllLocalizationText", false);
             DumpUntranslatedText = config.Bind("dump", "DumpUntranslatedText", true);
-            EnableCardGraphicText = config.Bind("card", "EnableCardGraphicText", true);
+            EnableCardGraphicText = config.Bind("card", "EnableCardGraphicText", false);
         }
     }
 }
