@@ -17,7 +17,12 @@ namespace PTCGLiveZhMod
 
         public static string AssetsDirectory { get { return Path.Combine(BaseDirectory, "assets"); } }
 
-        public static bool AssetsProvidedByKuyo { get { return File.Exists(Path.Combine(AssetsDirectory, "kuyo.provided")); } }
+        public static string AssetsProvider {
+            get {
+                var e = Path.Combine(AssetsDirectory, "assets.provider");
+                return File.Exists(e) ? File.ReadAllText(e).Trim() : "";
+            }
+        }
 
         public static string CardsDirectory { get { return Path.Combine(BaseDirectory, "cards"); } }
 

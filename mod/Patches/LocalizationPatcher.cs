@@ -83,9 +83,9 @@ namespace PTCGLiveZhMod.Patches
         static void GameVersionInfo_GetGameVersionPostfix(ref string __result)
         {
             __result = __result + "\n" + "中文化模组由 Hill-98 (小山) 制作";
-            if (Plugin.AssetsProvidedByKuyo)
+            if (!string.IsNullOrEmpty(Plugin.AssetsProvider))
             {
-                __result = __result + " & 中文化卡牌图片资源由 Kuyo 提供";
+                __result = __result + $" & 中文化卡牌图片资源由 {Plugin.AssetsProvider} 提供";
             }
         }
     }
