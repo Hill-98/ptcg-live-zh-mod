@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 const fs = require('fs')
-const { basename, join } = require('path')
+const { basename, dirname, join} = require('path')
+
+const ROOT_DIR = dirname(__dirname)
 
 const argv = process.argv.slice(2)
 
@@ -9,13 +11,13 @@ if (argv.length < 1) {
   process.exit(1)
 }
 
-const textUntranslatedFile = join(process.cwd(), 'text_untranslated/all.json')
-const textTranslatedFile = join(process.cwd(), 'text_zh-CN/all.json')
+const untranslatedTextFile = join(ROOT_DIR, 'text_untranslated/all.json')
+const translatedTextFile = join(ROOT_DIR, 'text_zh-CN/all.json')
 
 const data = fs.readFileSync(argv.shift(), { encoding: 'utf-8' })
-const textTranslated = JSON.parse(fs.readFileSync(textTranslatedFile, { encoding: 'utf-8' }))
-const textUntranslated = Object.create(null)
-const textTranslatedNew = Object.create(null)
+const translatedTextMap = JSON.parse(fs.readFileSync(translatedTextFile, { encoding: 'utf-8' }))
+const untranslatedTextMap = Object.create(null)
+const newTranslatedTextMap = Object.create(null)
 
 data.split('\n').forEach((line) => {
   const index = line.indexOf(':')
@@ -25,15 +27,15 @@ data.split('\n').forEach((line) => {
   const key = line.substring(0, index)
   const value = line.substring(index + 1)
   if (value.trim() !== '') {
-    textUntranslated[key] = value
+    untranslatedTextMap[key] = value
   }
 })
 
-Object.keys(textUntranslated).forEach((key) => {
-  if (Object.prototype.hasOwnProperty.call(textTranslated, key)) {
-    textTranslatedNew[key] = textTranslated[key]
+Object.keys(untranslatedTextMap).forEach((key) => {
+  if (Object.prototype.hasOwnProperty.call(translatedTextMap, key)) {
+    newTranslatedTextMap[key] = translatedTextMap[key]
   }
 })
 
-fs.writeFileSync(textTranslatedFile, JSON.stringify(textTranslatedNew, null, 4))
-fs.writeFileSync(textUntranslatedFile, JSON.stringify(textUntranslated, null, 4))
+fs.writeFileSync(translatedTextFile, JSON.stringify(newTranslatedTextMap, null, 4))
+fs.writeFileSync(untranslatedTextFile, JSON.stringify(untranslatedTextMap, null, 4))

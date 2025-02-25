@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 const { createHash } = require('crypto')
 const fs = require('fs')
-const { basename, join } = require('path')
+const { basename, dirname, join} = require('path')
+
+const ROOT_DIR = dirname(__dirname)
 
 const argv = process.argv.slice(2)
 
@@ -11,7 +13,7 @@ if (argv.length < 1) {
 }
 
 const cardsDir = argv.shift()
-const databaseDir = join(process.cwd(), 'databases')
+const databaseDir = join(ROOT_DIR, 'databases')
 
 if (!fs.existsSync(databaseDir)) {
   fs.mkdirSync(databaseDir)
