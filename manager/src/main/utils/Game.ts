@@ -1,6 +1,6 @@
 import { spawn, type SpawnOptions } from 'node:child_process'
 import { existsSync as exists } from 'node:fs'
-import { cp, readFile } from 'node:fs/promises'
+import { cp, readFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { app } from 'electron'
 import plist from 'plist'
@@ -129,7 +129,11 @@ export async function running(): Promise<boolean> {
 }
 
 export async function start(options: StartOptions): Promise<void> {
-  const loader = join(options.path, 'Contents/Resources/Data/Managed/Tobey.BepInEx.Bootstrap.dll')
+  const oldLoader = join(options.path, 'Contents/Resources/Data/Managed/Tobey.BepInEx.Bootstrap.dll')
+  if (exists(oldLoader)) {
+    await rm(oldLoader)
+  }
+  const loader = join(options.path, 'Contents/Resources/Data/Managed/BepInEx.Bootstrap.dll')
   if (options.macos && process.platform === 'darwin') {
     const info = plist.parse(await readFile(join(options.path, 'Contents/Info.plist'), { encoding: 'utf-8' })) as Record<string, any>
     const installedVersion = typeof info.CFBundleShortVersionString === 'string' ? info.CFBundleShortVersionString : '999.999.999'
