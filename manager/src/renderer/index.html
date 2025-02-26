@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html class="scheme-light-dark size-full" lang="zh-Hans-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>PTCGL 中文化模组管理器</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="size-full select-none **:focus-visible:outline-pink-400/75 text-neutral-900 dark:text-neutral-100">
+  <dialog data-version="202502201" id="terms-of-use" class="m-auto bg-white backdrop:bg-white text-black">
+    <div class="px-2 select-text text-sm text-pretty *:my-0.5">
+      <p>本中文化模组由 <a href="https://github.com/Hill-98" rel="external" target="_blank">Hill-98 (小山)</a>
+        开发，旨在为 <a href="https://tcg.pokemon.com/en-us/tcgl/" rel="external" target="_blank">Pokémon TCG Live</a>
+        提供中文化翻译，但可能存在翻译错误或遗漏。使用本插件可能会导致游戏出现意外行为或崩溃。</p>
+      <p>使用本程序前，请仔细阅读以下免责声明：</p>
+      <ul class="list-disc list-inside">
+        <li>本模组不属于游戏官方产品，也不受游戏官方支持。</li>
+        <li>使用本模组可能会导致游戏出现意外行为或崩溃。</li>
+        <li>开发者不对因使用本模组而造成的任何损失或损害负责。</li>
+      </ul>
+      <p>如果您同意以上使用条款，请继续使用本程序。</p>
+      <p>如果您不同意以上使用条款，请立即退出本程序。</p>
+    </div>
+    <div class="flex justify-center gap-8 mt-4 select-none text-md *:px-12 *:py-2 *:cursor-pointer *:text-white *:rounded-2xl">
+      <button data-action="agree" class="bg-blue-500 hover:bg-blue-400 active:bg-blue-600">同意</button>
+      <button data-action="reject" class="bg-red-500 hover:bg-red-400 active:bg-red-600">拒绝</button>
+    </div>
+  </dialog>
+  <div id="app" class="h-full mx-2 pt-2 flex flex-col">
+    <main class="flex flex-auto w-full">
+      <div class="basis-2/5">
+        <fieldset class="px-2 pb-2 bg-white/60 dark:bg-neutral-600/20 shadow dark:shadow-black/20 rounded-md">
+          <legend class="mb-0.5 font-bold text-sm">翻译成员列表（排名不分先后）：</legend>
+          <div id="members" class="flex flex-wrap gap-1 font-medium text-xs *:text-slate-600 dark:*:text-slate-200 *:hover:font-bold *:hover:text-pink-400"></div>
+        </fieldset>
+      </div>
+      <div class="basis-3/5 ml-4 flex flex-col">
+        <div class="flex-auto">
+          <fieldset class="px-4 pb-2 flex flex-col gap-1 accent-pink-600 bg-white/60 dark:bg-neutral-600/20 shadow dark:shadow-black/20 rounded-md">
+            <legend class="mb-0.5 font-bold text-sm">选项</legend>
+            <div class="text-sm flex flex-wrap">
+              <label class="block basis-full mb-0.5 text-xs" for="game-install-path">游戏安装路径</label>
+              <input class="bg-white/50 border border-gray-300 shadow rounded-md basis-10/12" id="game-install-path" readonly type="text">
+              <button id="select-game-install-path" class="ml-1 px-2 disabled:cursor-not-allowed bg-white/75 hover:bg-gray-100/75 active:bg-gray-200/75 border border-gray-200 shadow text-black rounded-md text-center text-xs">
+                选择
+              </button>
+            </div>
+            <div class="mr-auto has-[:disabled]:cursor-not-allowed has-[:disabled]:*:cursor-not-allowed">
+              <input id="card-left-text" type="checkbox">
+              <label for="card-left-text">卡牌左侧显示文本</label>
+            </div>
+            <div class="mr-auto has-[:disabled]:cursor-not-allowed has-[:disabled]:*:cursor-not-allowed">
+              <input id="disable-plugin" type="checkbox" class="disabled:cursor-not-allowed">
+              <label for="disable-plugin">禁用中文化模组</label>
+            </div>
+          </fieldset>
+        </div>
+        <div class="basis-5/12">
+          <p class="mb-2 text-center text-xs">状态：<span id="status-text">initializing</span></p>
+          <button id="primary-button" class="block mx-auto min-w-56 px-6 py-3 disabled:cursor-not-allowed bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-stone-800 dark:hover:bg-stone-700 dark:active:bg-stone-800 shadow dark:shadow-black/20 rounded-2xl font-bold text-2xl text-center" tabindex="0">primary</button>
+          <button id="reinstall-button" class="block mx-auto mt-2 cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">重新安装中文化模组</button>
+          <button id="uninstall-button" class="block mx-auto mt-2 cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">卸载中文化模组</button>
+        </div>
+      </div>
+    </main>
+    <footer class="w-full text-center text-xs mb-2">
+      <p class="text-zinc-500">管理器版本：<span id="version">loading...</span></p>
+      <div class="mt-1 divide-x divide-gray-00 leading-2.5 *:px-1 *:text-blue-400 *:hover:text-blue-500 *:hover:underline">
+        <a href="https://github.com/Hill-98/ptcg-live-zh-mod" rel="external" target="_blank">开源仓库</a>
+        <a href="https://paratranz.cn/projects/9617" rel="external" target="_blank">翻译项目</a>
+        <a href="https://url.mivm.cn/ptcg-live-zh-mod-download" rel="external" target="_blank">下载网盘</a>
+        <a href="https://url.mivm.cn/ptcg-live-zh-mod-group" rel="external" target="_blank">交流QQ群</a>
+      </div>
+    </footer>
+  </div>
+  <div></div>
+  <script type="module" src="script.ts"></script>
+</body>
+</html>
