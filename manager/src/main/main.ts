@@ -164,6 +164,7 @@ async function installPluginAssets(state: GlobalState, asar: string, setProgress
     await mkdir(target, { recursive: true })
   }
   const files: { id: string, hash: string }[] = meta.files
+  setProgress(0)
   for (let i = 0; i < files.length; i++) {
     const item = files[i]
     const file = join(asar, 'files', item.id)
