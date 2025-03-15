@@ -38,7 +38,7 @@ export default class BepInExManager {
 
   static #BepInExVersion: string = '0.0.0.0'
 
-  readonly #installDir: string
+  readonly #installPath: string
 
   readonly #paths = {
     BepInEx: '',
@@ -50,9 +50,9 @@ export default class BepInExManager {
     LogOutput: '',
   }
 
-  constructor(dir: string) {
-    const bepInExDir = join(dir, 'BepInEx')
-    this.#installDir = dir
+  constructor(path: string) {
+    const bepInExDir = join(path, 'BepInEx')
+    this.#installPath = path
     this.#paths = {
       BepInEx: bepInExDir,
       cache: join(bepInExDir, 'cache'),
@@ -146,11 +146,14 @@ export default class BepInExManager {
   }
 
   async install(): Promise<void> {
+    if (!exists(this.#installPath)) {
+      await mkdir(this.#installPath, { recursive: true })
+    }
     const bep = BepInExManager.#BepInExFile
     if (bep === '' || !exists(bep)) {
       throw new Error('BepInEx installation package not found')
     }
-    await new UnzipFile(bep).extract(this.#installDir)
+    await new UnzipFile(bep).extract(this.#installPath)
   }
 
   async installPlugin(name: string, source: string): Promise<void> {
@@ -181,8 +184,8 @@ export default class BepInExManager {
 
   isInstalled(): boolean {
     const loader = process.platform === 'win32'
-      ? join(this.#installDir, 'winhttp.dll')
-      : join(this.#installDir, `libdoorstop.${process.platform === 'darwin' ? 'dylib' : 'so'}`)
+      ? join(this.#installPath, 'winhttp.dll')
+      : join(this.#installPath, `libdoorstop.${process.platform === 'darwin' ? 'dylib' : 'so'}`)
     if (!exists(loader)) {
       return false
     }
@@ -212,7 +215,7 @@ export default class BepInExManager {
 
   async uninstall(): Promise<void> {
     for (const file of BepInExFiles) {
-      const path = join(this.#installDir, file)
+      const path = join(this.#installPath, file)
       if (exists(path)) {
         await rm(path, { recursive: true })
       }
