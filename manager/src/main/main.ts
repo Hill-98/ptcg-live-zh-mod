@@ -251,11 +251,11 @@ function webContentsWindowOpenHandler(details: HandlerDetails): WindowOpenHandle
       const path = decodeURIComponent(u.pathname.substring(1))
       stat(path)
         .then((value) => {
-          if (value.isDirectory()) {
+          if (value.isDirectory() && (process.platform !== 'darwin' || !path.endsWith('.app'))) {
             return shell.openPath(path)
           }
           shell.showItemInFolder(path)
-          return Promise.resolve(null)
+          return Promise.resolve('')
         })
         .catch(console.error)
     }
