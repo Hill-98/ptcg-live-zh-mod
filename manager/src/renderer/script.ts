@@ -5,6 +5,9 @@ import './termsOfUse.ts'
 
 type PrimaryAction = 'install' | 'start' | 'upgrade'
 
+const ASSETS_NO_INSTALLED = '检测到当前尚未安装中文卡牌资源包，推荐安装以获得更好中文化体验，是否选择本地的中文卡牌资源包并安装？'
+const ASSETS_VERSION_IS_LOW = '检测到当前安装的中文卡牌资源包不是最新版本，推荐更新以获得更好中文化体验，是否选择本地的中文卡牌资源包并更新？'
+
 const app = ipc.app.functions
 const game = ipc.game.functions
 
@@ -71,8 +74,8 @@ async function install(): Promise<void> {
   const checkResult = await app.checkPluginAssets()
   if (!checkResult) {
     const popupText = checkResult === undefined
-      ? '检测到当前尚未安装中文卡牌资源包，推荐安装以获得更好中文化体验，是否选择本地的中文卡牌资源包并安装？'
-      : '检测到当前安装的中文卡牌资源包不是最新版本，推荐更新以获得更好中文化体验，是否选择本地的中文卡牌资源包并更新？'
+      ? ASSETS_NO_INSTALLED
+      : ASSETS_VERSION_IS_LOW
     if ((await popup({ cancelButton: '否', confirmButton: '是', text: popupText })).confirmed) {
       setStatusText('正在等待用户选择文件...')
       while (true) {
@@ -90,7 +93,10 @@ async function install(): Promise<void> {
             return
           }
           ipc.app.off('onInstallPluginAssets', progressHandler)
-          break
+          const result = await app.checkPluginAssets()
+          if (result || (await popup({ cancelButton: '否', confirmButton: '是', text: ASSETS_VERSION_IS_LOW })).cancelled) {
+            break
+          }
         } else if (asar === 0) {
           await popup('您没有选择中文卡牌资源包，取消安装中文卡牌资源包。')
           break
@@ -110,14 +116,21 @@ async function install(): Promise<void> {
 async function main(): Promise<void> {
   setStatusText('正在检查外部实用工具可用性...')
   if (!await game.extUtilIsAvailable()) {
-    await popup('外部实用工具不可用，尝试关闭防病毒软件后重新运行。', '错误', 'error')
+    await popup('外部实用工具不可用，尝试关闭防病毒软件后重新运行。', '', 'error')
     window.close()
     return
   }
   setStatusText('正在检查游戏是否正在运行...')
   if (await game.running()) {
-    await popup('Pokémon TCG Live 正在运行，请先关闭游戏。', '错误', 'error')
+    await popup('Pokémon TCG Live 正在运行，请先关闭游戏。', '', 'error')
     location.reload()
+    return
+  }
+
+  if (!await app.hostnameIsValid()) {
+    await popup('检测到您的计算机名称包含非法字符，将会导致游戏启动后出现错误，请将计算机名称更改为英文后重试。', '', 'warning')
+    window.open('https://xtgs.mivm.cn/guide/faq/InvalidHostname')
+    window.close()
     return
   }
 
@@ -194,6 +207,9 @@ if (await app.pluginInstalled()) {
         e.cardLeftText.checked = !!result
         if (result === undefined) {
           popup('未找到配置文件，请先启动一次游戏以自动生成配置文件。', '', 'warning').catch(console.error)
+        }
+        if (e.cardLeftText.checked) {
+          popup('此功能为实验性功能，可能会对游戏造成未知影响，如果您在游戏里遇到了未知行为，请尝试关闭此功能后重新进入游戏。', '', 'warning').catch(console.error)
         }
       })
       .catch(errorPopup)

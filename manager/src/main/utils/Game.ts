@@ -2,10 +2,10 @@ import { spawn, type SpawnOptions } from 'node:child_process'
 import { existsSync as exists } from 'node:fs'
 import { cp, readFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
+import { compare } from 'compare-versions'
 import { app } from 'electron'
 import plist from 'plist'
 import { bin } from '../Paths.ts'
-import { compare } from 'compare-versions'
 
 interface ExecResult {
   status: number

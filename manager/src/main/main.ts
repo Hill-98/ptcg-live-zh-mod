@@ -1,15 +1,17 @@
 import { existsSync as exists } from 'node:fs'
 import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { hostname } from 'node:os'
 import { dirname, join } from 'node:path';
-import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, shell } from 'electron'
+import * as protocolHelper from '@hill-98/electron-forge-plugin-vite/protocol-helper'
+import { getFileVersion } from 'cfv'
+import { compare } from 'compare-versions'
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, protocol, shell } from 'electron'
 import type { HandlerDetails, WindowOpenHandlerResponse } from 'electron'
 import { IpcServerController } from 'electron-ipc-flow'
 import * as ipc from './ipc.ts'
 import * as Paths from './Paths.ts';
-import * as Game from './utils/Game.ts'
 import BepInExManager from './lib/BepInExManager.ts'
-import { getFileVersion } from 'cfv'
-import { compare } from 'compare-versions'
+import * as Game from './utils/Game.ts'
 
 interface GlobalState {
   config: {
@@ -20,7 +22,7 @@ interface GlobalState {
 
 const CONFIG_FILE = join(app.getPath('userData'), 'config.json')
 const MACOS_BEPINEX_PATH = join(app.getPath('appData'), 'BepInEx/Pokemon TCG Live')
-const PLUGIN_ASSETS_VERSION = 2025012301
+const PLUGIN_ASSETS_VERSION = 2025040301
 const PLUGIN_NAME = 'PTCGLiveZhMod'
 const PLUGIN_CONFIG_NAME = 'c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3'
 
@@ -45,6 +47,22 @@ const uncaughtExceptionHandler = (err: any) => {
 
 process.on('uncaughtException', uncaughtExceptionHandler)
 
+function handleRendererError(error: any): Promise<void> {
+  /**
+   * --no-sandbox shouldn't be used in production environments, but it can work
+   * around some quirks on people's systems, so.
+   */
+  if (!process.argv.includes('--no-sandbox') && error.code === 'ERR_FAILED') {
+    app.relaunch({
+      args: ['--no-sandbox', ...process.argv.splice(1)],
+    })
+    app.exit(0)
+    return Promise.resolve()
+  }
+
+  return Promise.reject(error)
+}
+
 async function createMainWindow(): Promise<void> {
   const window = new BrowserWindow({
     backgroundMaterial: 'mica',
@@ -54,17 +72,14 @@ async function createMainWindow(): Promise<void> {
     height: 360,
     resizable: false,
     show: false,
+    thickFrame: false,
     useContentSize: true,
     webPreferences: {
       preload: join(Paths.app, '.vite/preload/preload.cjs'),
     },
   })
   window.once('ready-to-show', window.show.bind(window))
-  if (import.meta.env.DEV) {
-    await window.loadURL(import.meta.env.VITE_RENDERER_URL.concat('/index.html'))
-  } else {
-    await window.loadFile(join(Paths.app, '.vite/renderer/index.html')).catch(handleRendererError)
-  }
+  await window.loadURL(import.meta.env.VITE_RENDERER_URL.concat('/index.html')).catch(handleRendererError)
 }
 
 async function cleanOldMacOSVersion(): Promise<void> {
@@ -97,22 +112,6 @@ async function getBundlePluginVersion(): Promise<string | undefined> {
   return undefined
 }
 
-function handleRendererError(error: any): Promise<void> {
-  /**
-   * --no-sandbox shouldn't be used in production environments, but it can work
-   * around some quirks on people's systems, so.
-   */
-  if (!process.argv.includes('--no-sandbox') && error.code === 'ERR_FAILED') {
-    app.relaunch({
-      args: ['--no-sandbox', ...process.argv.splice(1)],
-    })
-    app.exit(0)
-    return Promise.resolve()
-  }
-
-  return Promise.reject(error)
-}
-
 async function getLocalPluginAssetsVersion(state: GlobalState): Promise<number> {
   const bep = getBepInExManager(state)
   const plugin = await bep?.getPluginPath(PLUGIN_NAME)
@@ -124,6 +123,13 @@ async function getLocalPluginAssetsVersion(state: GlobalState): Promise<number> 
     }
   }
   return 0
+}
+
+function hostnameIsValid(hostname: string): boolean {
+  if (process.platform !== 'win32') {
+    return true
+  }
+  return encodeURIComponent(hostname) === hostname
 }
 
 async function installPlugin(state: GlobalState): Promise<void> {
@@ -202,7 +208,7 @@ async function selectGameInstallDirectory(window: BrowserWindow): Promise<string
       : [{ name: 'Pokemon TCG Live.app', extensions: ['app'] }],
     properties: [
       'dontAddToRecent',
-      'openFile'
+      'openFile',
     ],
   })
   if (result.canceled) {
@@ -222,7 +228,7 @@ async function selectPluginAssetsPackage(window: BrowserWindow, localVersion?: n
     filters: [{ name: '资源包', extensions: ['asar'] }],
     properties: [
       'dontAddToRecent',
-      'openFile'
+      'openFile',
     ],
   })
   if (result.canceled || result.filePaths.length === 0) {
@@ -266,9 +272,6 @@ function webContentsWindowOpenHandler(details: HandlerDetails): WindowOpenHandle
 }
 
 async function onReady(): Promise<void> {
-  if (process.platform === 'darwin' && exists(MACOS_BEPINEX_PATH)) {
-    await mkdir(MACOS_BEPINEX_PATH, { recursive: true })
-  }
   await readConfig(globalState)
   await createMainWindow()
 }
@@ -290,7 +293,7 @@ async function writeConfig(state: GlobalState): Promise<void> {
 }
 
 app.on('web-contents-created', (_, contents) => {
-  if (import.meta.env.DEV) {
+  if (process.env.NODE_ENV === 'development') {
     setImmediate(contents.openDevTools.bind(contents, { mode: 'detach' }))
   }
 
@@ -308,6 +311,16 @@ app.once('window-all-closed', () => {
 
 BepInExManager.setBepInExFilePath(join(Paths.resourcesBundle, 'BepInEx.zip'))
 Menu.setApplicationMenu(null)
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: protocolHelper.SCHEME,
+    privileges: {
+      standard: true,
+      secure: true,
+    },
+  }
+])
+protocolHelper.init()
 
 /**
  * If --no-sandbox is present here, we should also disable GPU and hardware
@@ -319,6 +332,11 @@ if (process.argv.includes('--no-sandbox')) {
 }
 
 if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', () => {
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.show()
+    }
+  })
   app.whenReady().then(onReady).catch(uncaughtExceptionHandler)
 } else {
   app.once('ready', () => {
@@ -355,6 +373,7 @@ ipc.app.handlers = {
     }
     return globalState.config.game_installDirectory ?? ''
   },
+  hostnameIsValid: hostnameIsValid.bind(null, hostname()),
   installPlugin: installPlugin.bind(null, globalState),
   async installPluginAssets(asar: string): Promise<void> {
     let lastProgress = -1

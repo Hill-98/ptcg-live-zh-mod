@@ -1,9 +1,9 @@
-import { app as electron } from 'electron'
 import { join } from 'node:path'
+import { app as electron } from 'electron'
 
 export const app = electron.getAppPath()
 
-export const unpack = app.replace('app.asar', 'app.asar.unpacked')
+export const unpack = app.replace(/app\.asar$/, 'app.asar.unpacked')
 
 export const bin = join(unpack, 'bin')
 
