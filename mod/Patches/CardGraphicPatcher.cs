@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using CardDatabase.DataAccess.CardFormat;
 using HarmonyLib;
@@ -44,10 +45,17 @@ namespace PTCGLiveZhMod.Patches
         {
             // BigCardMenu 手牌
             // CardInspectionMenu 弃牌区，检索卡牌等
-            return obj is BigCardMenu
+            try
+            {
+                return obj is BigCardMenu
                 || obj is CardInspectionMenu
                 || IsBattleStadiumCard(obj, card)
                 || IsPokemonAttachCard(obj, card);
+            } catch (Exception ex)
+            {
+                Plugin.LoggerInstance.LogError(ex);
+                return false;
+            }
 
         }
 
@@ -66,10 +74,17 @@ namespace PTCGLiveZhMod.Patches
             }
             if (__instance is BigCardUIMenu)
             {
-                var card = AccessTools.Field(typeof(BigCardUIMenu), "_currentCard").GetValue(__instance) as CardUI;
-                if (card != null)
+                try
                 {
-                    __instance.StartCoroutine(CardUI_LoadTextVersion(card));
+                    var card = AccessTools.Field(typeof(BigCardUIMenu), "_currentCard").GetValue(__instance) as CardUI;
+                    if (card != null)
+                    {
+                        __instance.StartCoroutine(CardUI_LoadTextVersion(card));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Plugin.LoggerInstance.LogError(ex);
                 }
             }
         }
@@ -105,7 +120,14 @@ namespace PTCGLiveZhMod.Patches
         static IEnumerator Card3DGraphic_LoadTextVersion(Card3DGraphic card)
         {
             yield return new WaitForSeconds(0.3f);
-            AccessTools.Method(typeof(Card3DGraphic), "LoadTextVersion").Invoke(card, new object[0]);
+            try
+            {
+                AccessTools.Method(typeof(Card3DGraphic), "LoadTextVersion").Invoke(card, new object[0]);
+            }
+            catch (Exception ex)
+            {
+                Plugin.LoggerInstance.LogError(ex);
+            }
             yield return null;
         }
 
@@ -115,7 +137,14 @@ namespace PTCGLiveZhMod.Patches
         static IEnumerator CardUI_LoadTextVersion(CardUI card)
         {
             yield return new WaitForSeconds(0.3f);
-            AccessTools.Method(typeof(CardUI), "LoadTextVersion").Invoke(card, new object[0]);
+            try
+            {
+                AccessTools.Method(typeof(CardUI), "LoadTextVersion").Invoke(card, new object[0]);
+            }
+            catch (Exception ex)
+            {
+                Plugin.LoggerInstance.LogError(ex);
+            }
             yield return null;
         }
 
@@ -234,7 +263,14 @@ namespace PTCGLiveZhMod.Patches
         [HarmonyPostfix]
         static void CardCountStackParts_SetupPostfix(CardCountStackParts __instance)
         {
-            AccessTools.Method(typeof(CardCountStackParts), "ShowLoadingText").Invoke(__instance, new object[] { null });
+            try
+            {
+                AccessTools.Method(typeof(CardCountStackParts), "ShowLoadingText").Invoke(__instance, new object[] { "" });
+            }
+            catch (Exception ex)
+            {
+                Plugin.LoggerInstance.LogError(ex);
+            }
         }
 
         /// <summary>
