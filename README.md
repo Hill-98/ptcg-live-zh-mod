@@ -35,7 +35,7 @@
 * [Mifa17](https://paratranz.cn/users/52872)
 * [Myosotis1024](https://paratranz.cn/users/54804)
 * [cheKnowYoung](https://paratranz.cn/users/57503)
-* [damaomao2](https://paratranz.cn/users/58711)
+* [B站实况游戏的狐狸 (damaomao2)](https://paratranz.cn/users/58711)
 * [ChpyX2](https://paratranz.cn/users/58841)
 
 ## Copyright (版权)
