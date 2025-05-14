@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="size-full select-none **:focus-visible:outline-pink-400/75 text-neutral-900 dark:text-neutral-100">
-  <dialog data-version="202502201" id="terms-of-use" class="m-auto bg-white backdrop:bg-white text-black">
+  <dialog data-version="202502201" id="terms-of-use" class="m-auto bg-white dark:bg-zinc-900 backdrop:bg-white dark:backdrop:bg-zinc-900 text-black dark:text-white">
     <div class="px-2 select-text text-sm text-pretty *:my-0.5">
       <p>本中文化模组由 <a href="https://github.com/Hill-98" rel="noopener noreferrer" target="_blank">Hill-98 (小山)</a>
         开发，旨在为 <a href="https://tcg.pokemon.com/en-us/tcgl/" rel="noopener noreferrer" target="_blank">Pokémon TCG Live</a>
@@ -28,18 +28,18 @@
   <div id="app" class="h-full mx-2 pt-2 flex flex-col">
     <main class="flex flex-auto w-full">
       <div class="basis-2/5">
-        <fieldset class="px-2 pb-2 bg-white/60 dark:bg-neutral-600/20 shadow dark:shadow-black/20 rounded-md">
+        <fieldset class="px-2 pb-2 bg-white/60 dark:bg-zinc-900/40 shadow dark:shadow-black/20 rounded-md">
           <legend class="mb-0.5 font-bold text-sm">翻译成员列表（排名不分先后）：</legend>
           <div id="members" class="flex flex-wrap gap-1 font-medium text-xs *:text-slate-600 dark:*:text-slate-200 *:hover:font-bold *:hover:text-pink-400"></div>
         </fieldset>
       </div>
       <div class="basis-3/5 ml-4 flex flex-col">
         <div class="flex-auto">
-          <fieldset class="px-4 pb-2 flex flex-col gap-1 accent-pink-600 bg-white/60 dark:bg-neutral-600/20 shadow dark:shadow-black/20 rounded-md">
+          <fieldset class="px-4 pb-2 flex flex-col gap-1 accent-pink-600 bg-white/60 dark:bg-zinc-900/40 shadow dark:shadow-black/20 rounded-md">
             <legend class="mb-0.5 font-bold text-sm">选项</legend>
             <div class="text-sm flex flex-wrap">
               <label class="block basis-full mb-0.5 text-xs" for="game-install-path">游戏安装路径</label>
-              <input class="bg-white/50 border border-gray-300 shadow rounded-md basis-10/12" id="game-install-path" readonly type="text">
+              <input class="bg-white/70 dark:bg-black/30 border border-gray-300 shadow rounded-md basis-10/12" id="game-install-path" readonly type="text">
               <button id="select-game-install-path" class="ml-1 px-2 disabled:cursor-not-allowed bg-white/75 hover:bg-gray-100/75 active:bg-gray-200/75 border border-gray-200 shadow text-black rounded-md text-center text-xs">
                 选择
               </button>
@@ -56,14 +56,14 @@
         </div>
         <div class="basis-5/12">
           <p class="mb-2 text-center text-xs">状态：<span id="status-text">initializing</span></p>
-          <button id="primary-button" class="block mx-auto min-w-56 px-6 py-3 disabled:cursor-not-allowed bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-stone-800 dark:hover:bg-stone-700 dark:active:bg-stone-800 shadow dark:shadow-black/20 rounded-2xl font-bold text-2xl text-center" tabindex="0">primary</button>
+          <button id="primary-button" class="block mx-auto min-w-56 px-6 py-3 disabled:cursor-not-allowed bg-white hover:bg-gray-50 active:bg-gray-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:active:bg-zinc-800 shadow dark:shadow-black/20 rounded-2xl font-bold text-2xl text-center" tabindex="0">primary</button>
           <button id="reinstall-button" class="block mx-auto mt-2 cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">重新安装中文化模组</button>
           <button id="uninstall-button" class="block mx-auto mt-2 cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">卸载中文化模组</button>
         </div>
       </div>
     </main>
     <footer class="w-full text-center text-xs mb-2">
-      <p class="text-zinc-500">管理器版本：<span id="version">loading...</span></p>
+      <p class="text-zinc-500 dark:text-zinc-300">管理器版本：<span id="version">loading...</span></p>
       <div class="mt-1 divide-x divide-gray-00 leading-2.5 *:px-1 *:text-blue-400 *:hover:text-blue-500 *:hover:underline">
         <a href="https://github.com/Hill-98/ptcg-live-zh-mod" rel="noopener noreferrer" target="_blank">开源仓库</a>
         <a href="https://paratranz.cn/projects/9617" rel="noopener noreferrer" target="_blank">翻译项目</a>

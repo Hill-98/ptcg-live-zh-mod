@@ -1,6 +1,6 @@
-import { IpcClientController } from 'electron-ipc-flow'
+import { createIpcClient } from 'electron-ipc-flow'
 import type { AppClientEvents, AppIpc, GameIpc } from '../types.ts'
 
-export const app = new IpcClientController<AppIpc, AppClientEvents>('app')
+export const app = createIpcClient<AppIpc, AppClientEvents>('app')
 
-export const game = new IpcClientController<GameIpc>('game')
+export const game = createIpcClient<GameIpc>('game')

@@ -1,4 +1,4 @@
-import * as ipc from './ipc.ts'
+import { app, game } from './ipc.ts'
 import { show as popup } from './PopupDialog.ts'
 import './members.ts'
 import './termsOfUse.ts'
@@ -7,9 +7,6 @@ type PrimaryAction = 'install' | 'start' | 'upgrade'
 
 const ASSETS_NO_INSTALLED = '检测到当前尚未安装中文卡牌资源包，推荐安装以获得更好中文化体验，是否选择本地的中文卡牌资源包并安装？'
 const ASSETS_VERSION_IS_LOW = '检测到当前安装的中文卡牌资源包不是最新版本，推荐更新以获得更好中文化体验，是否选择本地的中文卡牌资源包并更新？'
-
-const app = ipc.app.functions
-const game = ipc.game.functions
 
 const e = {
   cardLeftText: document.getElementById('card-left-text') as HTMLInputElement,
@@ -63,15 +60,15 @@ function setStatusText(text: string) {
 async function install(): Promise<void> {
   setStatusText('正在安装中文化模组...')
   try {
-    await app.installPlugin()
+    await app.$installPlugin()
   } catch (err: any) {
-    app.uninstallPlugin().catch(console.error)
+    app.$uninstallPlugin().catch(console.error)
     await popup(`安装中文化模组时发生错误，尝试关闭防病毒软件后重新安装。\n错误信息：${err.message}`, '', 'error')
     return
   }
 
   setStatusText('正在检查资源包版本...')
-  const checkResult = await app.checkPluginAssets()
+  const checkResult = await app.$checkPluginAssets()
   if (!checkResult) {
     const popupText = checkResult === undefined
       ? ASSETS_NO_INSTALLED
@@ -79,21 +76,21 @@ async function install(): Promise<void> {
     if ((await popup({ cancelButton: '否', confirmButton: '是', text: popupText })).confirmed) {
       setStatusText('正在等待用户选择文件...')
       while (true) {
-        const asar = await app.selectPluginAssetsPackage()
+        const asar = await app.$selectPluginAssetsPackage()
         if (typeof asar === 'string') {
           setStatusText('正在准备安装中文卡牌资源包...')
           const progressHandler = (_: any, progress: string) => {
             setStatusText(`正在安装中文卡牌资源包 (${progress}%) ...`)
           }
-          ipc.app.on('onInstallPluginAssets', progressHandler)
+          app.on('onInstallPluginAssets', progressHandler)
           try {
-            await app.installPluginAssets(asar)
+            await app.$installPluginAssets(asar)
           } catch (err: any) {
             await popup(`安装中文卡牌资源包时发生错误，请尝试重新下载中文卡牌资源包后再次安装。\n错误信息：${err.message}`, '', 'error')
             return
           }
-          ipc.app.off('onInstallPluginAssets', progressHandler)
-          const result = await app.checkPluginAssets()
+          app.off('onInstallPluginAssets', progressHandler)
+          const result = await app.$checkPluginAssets()
           if (result || (await popup({ cancelButton: '否', confirmButton: '是', text: ASSETS_VERSION_IS_LOW })).cancelled) {
             break
           }
@@ -115,19 +112,19 @@ async function install(): Promise<void> {
 
 async function main(): Promise<void> {
   setStatusText('正在检查外部实用工具可用性...')
-  if (!await game.extUtilIsAvailable()) {
+  if (!await game.$extUtilIsAvailable()) {
     await popup('外部实用工具不可用，尝试关闭防病毒软件后重新运行。', '', 'error')
     window.close()
     return
   }
   setStatusText('正在检查游戏是否正在运行...')
-  if (await game.running()) {
+  if (await game.$running()) {
     await popup('Pokémon TCG Live 正在运行，请先关闭游戏。', '', 'error')
     location.reload()
     return
   }
 
-  if (!await app.hostnameIsValid()) {
+  if (!await app.$hostnameIsValid()) {
     await popup('检测到您的计算机名称包含非法字符，将会导致游戏启动后出现错误，请将计算机名称更改为英文后重试。', '', 'warning')
     window.open('https://xtgs.mivm.cn/guide/faq/InvalidHostname')
     window.close()
@@ -135,10 +132,10 @@ async function main(): Promise<void> {
   }
 
   setStatusText('正在检查游戏安装目录...')
-  let gameDir = await app.gameInstallDirectory()
+  let gameDir = await app.$gameInstallDirectory()
 
-  if (!await game.isInstallDirectory(gameDir)) {
-    const auto = await game.detectInstallDirectory()
+  if (!await game.$isInstallDirectory(gameDir)) {
+    const auto = await game.$detectInstallDirectory()
     const manual = !auto || (await popup({
       cancelButton: '否',
       confirmButton: '是',
@@ -152,7 +149,7 @@ async function main(): Promise<void> {
       if (!auto) {
         await popup('未找到 Pokémon TCG Live 安装目录，请点击确定后手动选择游戏安装目录。', '', 'info')
       }
-      const result = await app.selectGameInstallDirectory()
+      const result = await app.$selectGameInstallDirectory()
       if (typeof result === 'string' && result.trim() !== '') {
         gameDir = result
       } else {
@@ -165,13 +162,13 @@ async function main(): Promise<void> {
     } else {
       gameDir = auto
     }
-    await app.gameInstallDirectory(gameDir)
+    await app.$gameInstallDirectory(gameDir)
   }
   setGameInstallDirectory(gameDir)
 
   setStatusText('正在检查模组是否已安装...')
-  if (await app.pluginInstalled()) {
-    const upgradable = await app.pluginUpgradable()
+  if (await app.$pluginInstalled()) {
+    const upgradable = await app.$pluginUpgradable()
     e.reinstallButton.style.display = upgradable ? 'none' : ''
     setPrimaryButtonAction(upgradable ? 'upgrade' : 'start')
   } else {
@@ -180,13 +177,13 @@ async function main(): Promise<void> {
     setPrimaryButtonAction('install')
   }
 
-  e.cardLeftText.checked = !!await app.pluginFeature('EnableCardGraphicText')
-  e.disablePlugin.checked = await app.disablePlugin()
+  e.cardLeftText.checked = !!await app.$pluginFeature('EnableCardGraphicText')
+  e.disablePlugin.checked = await app.$disablePlugin()
 
   setStatusText('准备就绪')
 }
 
-app.version().then((version) => {
+app.$version().then((version) => {
   e.version.textContent = version
 })
 
@@ -199,10 +196,10 @@ try {
   window.close()
 }
 
-if (await app.pluginInstalled()) {
+if (await app.$pluginInstalled()) {
   e.cardLeftText.addEventListener('click', () => {
     setAllButtonDisable(true)
-    app.pluginFeature('EnableCardGraphicText', e.cardLeftText.checked)
+    app.$pluginFeature('EnableCardGraphicText', e.cardLeftText.checked)
       .then((result) => {
         e.cardLeftText.checked = !!result
         if (result === undefined) {
@@ -218,7 +215,7 @@ if (await app.pluginInstalled()) {
 
   e.disablePlugin.addEventListener('click', () => {
     setAllButtonDisable(true)
-    app.disablePlugin(e.disablePlugin.checked)
+    app.$disablePlugin(e.disablePlugin.checked)
       .then((result) => {
         e.disablePlugin.checked = result
       })
@@ -235,7 +232,7 @@ if (await app.pluginInstalled()) {
 
   e.uninstallButton.addEventListener('click', () => {
     setAllButtonDisable(true)
-    app.uninstallPlugin()
+    app.$uninstallPlugin()
       .then(() => {
         return popup('中文化模组卸载完成。', '', 'info')
       })
@@ -268,7 +265,7 @@ e.primaryButton.addEventListener('click', () => {
     })
   }
   if (action === 'start') {
-    game.start()
+    game.$start()
       .then(() => {
         let count = 0
         const timer = setInterval(() => {
@@ -278,7 +275,7 @@ e.primaryButton.addEventListener('click', () => {
             popup('启动游戏超时。', '', 'error').catch(console.error)
             return
           }
-          game.running().then((result) => {
+          game.$running().then((result) => {
             if (result) {
               clearInterval(timer)
               setTimeout(window.close.bind(window), 1000)
@@ -301,9 +298,9 @@ e.primaryButton.addEventListener('click', () => {
 })
 
 e.selectGameInstallPath.addEventListener('click', () => {
-  app.selectGameInstallDirectory().then((result) => {
+  app.$selectGameInstallDirectory().then((result) => {
     if (typeof result === 'string' && result.trim() !== '') {
-      app.gameInstallDirectory(result)
+      app.$gameInstallDirectory(result)
         .then(() => setGameInstallDirectory(result))
         .then(() => {
           location.reload()

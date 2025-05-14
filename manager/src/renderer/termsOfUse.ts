@@ -7,7 +7,7 @@ const agreeHandler = dialog.close.bind(dialog, 'agree')
 const rejectHandler = dialog.close.bind(dialog, 'reject')
 const lastVersion = Number.parseInt(dialog.dataset.version ?? '0')
 
-if (await app.functions.termsOfUseVersion() < lastVersion) {
+if (await app.$termsOfUseVersion() < lastVersion) {
   document.getElementById('app')!.style.display = 'none'
 
   agreeButton.addEventListener('click', agreeHandler)
@@ -16,7 +16,7 @@ if (await app.functions.termsOfUseVersion() < lastVersion) {
   const p = new Promise((resolve, reject) => {
     dialog.addEventListener('close', () => {
       if (dialog.returnValue === 'agree') {
-        resolve(app.functions.termsOfUseVersion(lastVersion))
+        resolve(app.$termsOfUseVersion(lastVersion))
       } else {
         window.close()
         reject()

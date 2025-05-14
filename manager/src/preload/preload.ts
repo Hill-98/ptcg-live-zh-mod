@@ -1,1 +1,1 @@
-import 'electron-ipc-flow/dist/preload.js';
+import 'electron-ipc-flow/preload';
