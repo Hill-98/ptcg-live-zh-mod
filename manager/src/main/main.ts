@@ -66,7 +66,7 @@ function handleRendererError(error: any): Promise<void> {
 async function createMainWindow(): Promise<void> {
   const window = new BrowserWindow({
     backgroundMaterial: 'mica',
-    vibrancy: 'hud',
+    vibrancy: 'titlebar',
     icon: nativeImage.createFromPath(join(Paths.resources, 'icons/app.png')),
     width: 640,
     height: 360,
@@ -310,7 +310,104 @@ app.once('window-all-closed', () => {
 })
 
 BepInExManager.setBepInExFilePath(join(Paths.resourcesBundle, 'BepInEx.zip'))
-Menu.setApplicationMenu(null)
+
+if (process.platform === 'darwin') {
+  Menu.setApplicationMenu(Menu.buildFromTemplate([
+    {
+      role: 'appMenu',
+      label: app.getName(),
+      submenu: [
+        {
+          role: 'about',
+          label: '关于 '.concat(app.getName()),
+        },
+        {
+          type: 'separator',
+        },
+        {
+          role: 'services',
+          label: '服务',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          role: 'hide',
+          label: '隐藏 '.concat(app.getName()),
+        },
+        {
+          role: 'hideOthers',
+          label: '隐藏其他',
+        },
+        {
+          role: 'unhide',
+          label: '全部显示',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          role: 'quit',
+          label: '退出 '.concat(app.getName()),
+        },
+      ]
+    },
+    {
+      role: 'editMenu',
+      label: '编辑',
+      submenu: [
+        {
+          role: 'undo',
+          label: '撤销',
+        },
+        {
+          role: 'redo',
+          label: '重做',
+        },
+        {
+          type: 'separator',
+        },
+        {
+          role: 'cut',
+          label: '剪切',
+        },
+        {
+          role: 'copy',
+          label: '复制',
+        },
+        {
+          role: 'paste',
+          label: '粘贴',
+        },
+        {
+          role: 'selectAll',
+          label: '全选',
+        },
+      ],
+    },
+    {
+      role: 'window',
+      label: '窗口',
+      submenu: [
+        {
+          role: 'close',
+          label: '关闭',
+        },
+        {
+          role: 'minimize',
+          label: '最小化',
+        },
+        {
+          role: 'zoom',
+          label: '缩放'
+        },
+      ],
+    },
+  ]))
+} else {
+  Menu.setApplicationMenu(null)
+}
+
 protocol.registerSchemesAsPrivileged([
   {
     scheme: protocolHelper.SCHEME,
@@ -334,18 +431,22 @@ if (process.argv.includes('--no-sandbox')) {
 if (app.requestSingleInstanceLock()) {
   app.on('second-instance', () => {
     for (const window of BrowserWindow.getAllWindows()) {
-      window.show()
+      window.once('ready-to-show', window.show.bind(window))
     }
   })
   app.whenReady().then(onReady).catch(uncaughtExceptionHandler)
 } else {
-  app.once('ready', () => {
-    dialog.showMessageBox({
-      message: app.getName().concat('已经在运行了！'),
-      title: app.getName(),
-      type: 'info',
-    }).finally(() => app.exit(0))
-  })
+  if (process.platform === 'darwin') {
+    app.quit()
+  } else {
+    app.once('ready', () => {
+      dialog.showMessageBox({
+        message: app.getName().concat('已经在运行了！'),
+        title: app.getName(),
+        type: 'info',
+      }).finally(() => app.quit())
+    })
+  }
 }
 
 IpcServerController.IpcMain = ipcMain
