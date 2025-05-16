@@ -158,6 +158,7 @@ export async function start(options: StartOptions): Promise<void> {
     } else {
       throw new Error('The game version is too low, please update to the latest version.')
     }
+    await exec('/usr/bin/xattr', ['-dr', 'com.apple.quarantine', options.path])
   }
   return new Promise((resolve, reject) => {
     spawn(join(options.path, getExecutable()), [], {
