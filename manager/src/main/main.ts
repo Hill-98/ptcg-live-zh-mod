@@ -149,6 +149,7 @@ async function installPlugin(state: GlobalState): Promise<void> {
   if (process.platform === 'darwin') {
     await cleanOldMacOSVersion()
   }
+  await Game.clearUnityCache()
 }
 
 async function installPluginAssets(state: GlobalState, asar: string, setProgress: (progress: number) => void): Promise<void> {
@@ -196,6 +197,11 @@ async function uninstallPlugin(state: GlobalState): Promise<void> {
   await bep.uninstallPlugin(PLUGIN_CONFIG_NAME, true)
   if ((await bep.getPlugins()).length === 0) {
     await bep.uninstall()
+  }
+  try {
+    await Game.clearUnityCache()
+  } catch (e) {
+    console.error(e)
   }
 }
 

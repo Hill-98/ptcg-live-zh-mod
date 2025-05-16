@@ -30,6 +30,21 @@ const is = {
   win32: process.platform === 'win32',
 }
 
+export async function clearUnityCache() {
+  if (is.darwin) {
+    const path = join(process.env.HOME ?? app.getPath('home'), 'Library/Caches/com.pokemon.pokemontcgl')
+    if (exists(path)) {
+      await rm(path, { recursive: true })
+    }
+  }
+  if (is.win32) {
+    const path = join(process.env.USERPROFILE ?? app.getPath('home'), 'AppData\\LocalLow\\Unity\\pokemon_Pokemon TCG Live')
+    if (exists(path)) {
+      await rm(path, { recursive: true })
+    }
+  }
+}
+
 function exec(file: string, args?: string[], options?: SpawnOptions): Promise<ExecResult> {
   const result = {
     status: -1,
