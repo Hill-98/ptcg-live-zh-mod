@@ -119,7 +119,9 @@ async function getLocalPluginAssetsVersion(state: GlobalState): Promise<number> 
     const file = join(dirname(plugin), 'assets/meta.json')
     if (exists(file)) {
       const meta = JSON.parse(await readFile(file, { encoding: 'utf-8' }))
-      return typeof meta.version === 'number' ? meta.version : 0
+      const version = typeof meta.version === 'number' ? meta.version : 0
+      // 修复某次资源包版本号错误
+      return version === 202504031 ? 2025040301 : version
     }
   }
   return 0
@@ -460,36 +462,6 @@ protocol.registerSchemesAsPrivileged([
 ])
 protocolHelper.init()
 
-/**
- * If --no-sandbox is present here, we should also disable GPU and hardware
- * acceleration and try to avoid other quirks.
- */
-if (process.argv.includes('--no-sandbox')) {
-  app.commandLine.appendSwitch('disable-gpu')
-  app.disableHardwareAcceleration()
-}
-
-if (app.requestSingleInstanceLock()) {
-  app.on('second-instance', () => {
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.once('ready-to-show', window.show.bind(window))
-    }
-  })
-  app.whenReady().then(onReady).catch(uncaughtExceptionHandler)
-} else {
-  if (process.platform === 'darwin') {
-    app.quit()
-  } else {
-    app.once('ready', () => {
-      dialog.showMessageBox({
-        message: app.getName().concat('已经在运行了！'),
-        title: app.getName(),
-        type: 'info',
-      }).finally(() => app.quit())
-    })
-  }
-}
-
 IpcServerController.IpcMain = ipcMain
 IpcServerController.WebContentsGetter = () => BrowserWindow.getAllWindows().map((win) => win.webContents)
 
@@ -567,7 +539,9 @@ ipc.app.handlers = {
   },
   uninstallPlugin: uninstallPlugin.bind(null, globalState),
   async version(): Promise<string> {
-    return `${app.getVersion()} (electron ${process.versions.electron}, ${process.platform}, bundle mod ${await getBundlePluginVersion()})`;
+    const installedPluginVersion = await getBepInExManager(globalState)?.getPluginVersion(PLUGIN_NAME)
+    const installedPluginAssetsVersion = await getLocalPluginAssetsVersion(globalState)
+    return `${app.getVersion()} (捆绑模组版本：${await getBundlePluginVersion()}${installedPluginVersion ? ` | 已安装模组版本：${installedPluginVersion} | 已安装资源包版本：${installedPluginAssetsVersion}` : ''})`;
   },
 }
 
