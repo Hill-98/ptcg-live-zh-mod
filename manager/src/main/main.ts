@@ -298,6 +298,41 @@ async function writeConfig(state: GlobalState): Promise<void> {
   }
 }
 
+// We don't need a keychain, so don't let macOS pop up the prompt.
+if (process.platform === 'darwin') {
+  app.commandLine.appendSwitch('use-mock-keychain')
+  app.commandLine.appendSwitch('disable-features', 'DialMediaRouteProvider')
+}
+/**
+ * If --no-sandbox is present here, we should also disable GPU and hardware
+ * acceleration and try to avoid other quirks.
+ */
+if (process.argv.includes('--no-sandbox')) {
+  app.commandLine.appendSwitch('disable-gpu')
+  app.disableHardwareAcceleration()
+}
+
+if (app.requestSingleInstanceLock()) {
+  app.on('second-instance', () => {
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.once('ready-to-show', window.show.bind(window))
+    }
+  })
+  app.whenReady().then(onReady).catch(uncaughtExceptionHandler)
+} else {
+  if (process.platform === 'darwin') {
+    app.quit()
+  } else {
+    app.once('ready', () => {
+      dialog.showMessageBox({
+        message: app.getName().concat('已经在运行了！'),
+        title: app.getName(),
+        type: 'info',
+      }).finally(() => app.quit())
+    })
+  }
+}
+
 app.on('web-contents-created', (_, contents) => {
   if (process.env.NODE_ENV === 'development') {
     setImmediate(contents.openDevTools.bind(contents, { mode: 'detach' }))
