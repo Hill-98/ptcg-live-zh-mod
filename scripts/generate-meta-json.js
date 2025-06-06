@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const { createHash } = require('crypto')
 const fs = require('fs')
 const { basename, join } = require('path')
