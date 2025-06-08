@@ -65,14 +65,12 @@ function handleRendererError(error: any): Promise<void> {
 
 async function createMainWindow(): Promise<void> {
   const window = new BrowserWindow({
-    backgroundMaterial: 'mica',
     vibrancy: 'titlebar',
     icon: nativeImage.createFromPath(join(Paths.resources, 'icons/app.png')),
     width: 640,
     height: 360,
     resizable: false,
     show: false,
-    thickFrame: false,
     useContentSize: true,
     webPreferences: {
       preload: join(Paths.app, '.vite/preload/preload.cjs'),
