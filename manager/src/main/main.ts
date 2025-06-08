@@ -22,7 +22,7 @@ interface GlobalState {
 
 const CONFIG_FILE = join(app.getPath('userData'), 'config.json')
 const MACOS_BEPINEX_PATH = join(app.getPath('appData'), 'BepInEx/Pokemon TCG Live')
-const PLUGIN_ASSETS_VERSION = 2025040301
+const PLUGIN_ASSETS_VERSION = 2025060501
 const PLUGIN_NAME = 'PTCGLiveZhMod'
 const PLUGIN_CONFIG_NAME = 'c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3'
 
