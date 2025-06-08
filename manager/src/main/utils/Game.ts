@@ -121,7 +121,7 @@ export function getExecutable(): string {
 }
 
 export function isInstallDirectory(dir: string): boolean {
-  if (dir.trim() === '') {
+  if (dir.trim() === '' || (is.win32 && !exists(join(dir, 'Pokemon TCG Live_Data/Managed/Assembly-CSharp.dll')))) {
     return false
   }
   return exists(join(dir, getExecutable()))
