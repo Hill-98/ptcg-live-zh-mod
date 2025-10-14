@@ -169,11 +169,11 @@ async function main(): Promise<void> {
   setStatusText('正在检查模组是否已安装...')
   if (await app.$pluginInstalled()) {
     const upgradable = await app.$pluginUpgradable()
-    e.reinstallButton.style.display = upgradable ? 'none' : ''
+    e.reinstallButton.style.visibility = upgradable ? 'hidden' : ''
     setPrimaryButtonAction(upgradable ? 'upgrade' : 'start')
   } else {
-    e.reinstallButton.style.display = 'none'
-    e.uninstallButton.style.display = 'none'
+    e.reinstallButton.style.visibility = 'hidden'
+    e.uninstallButton.style.visibility = 'hidden'
     setPrimaryButtonAction('install')
   }
 

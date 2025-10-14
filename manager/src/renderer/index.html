@@ -33,8 +33,8 @@
           <div id="members" class="flex flex-wrap gap-1 font-medium text-xs *:text-slate-600 dark:*:text-slate-200 *:hover:font-bold *:hover:text-pink-400"></div>
         </fieldset>
       </div>
-      <div class="basis-3/5 ml-4 flex flex-col">
-        <div class="flex-auto">
+      <div class="basis-3/5 ml-4 flex flex-col justify-between">
+        <div>
           <fieldset class="px-4 pb-2 flex flex-col gap-1 accent-pink-600 bg-white/60 dark:bg-zinc-900/40 shadow dark:shadow-black/20 rounded-md">
             <legend class="mb-0.5 font-bold text-sm">选项</legend>
             <div class="text-sm flex flex-wrap">
@@ -54,11 +54,13 @@
             </div>
           </fieldset>
         </div>
-        <div class="basis-5/12">
+        <div class="mb-2">
           <p class="mb-2 text-center text-xs">状态：<span id="status-text">initializing</span></p>
-          <button id="primary-button" class="block mx-auto min-w-56 px-6 py-3 disabled:cursor-not-allowed bg-white active:bg-gray-100 dark:bg-zinc-800 dark:active:bg-zinc-900 shadow dark:shadow-black/20 rounded-2xl font-bold text-2xl text-center" tabindex="0">primary</button>
-          <button id="reinstall-button" class="block mx-auto mt-2 cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">重新安装/修复中文化模组</button>
-          <button id="uninstall-button" class="block mx-auto mt-2 cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">卸载中文化模组</button>
+          <div class="flex flex-col gap-2 items-center">
+            <button id="primary-button" class="min-w-56 px-6 py-3 disabled:cursor-not-allowed bg-white active:bg-gray-100 dark:bg-zinc-800 dark:active:bg-zinc-900 shadow dark:shadow-black/20 rounded-2xl font-bold text-2xl text-center" tabindex="0">primary</button>
+            <button id="reinstall-button" class="cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">重新安装/修复中文化模组</button>
+            <button id="uninstall-button" class="cursor-pointer disabled:cursor-not-allowed text-blue-400 hover:text-blue-500 active:text-blue-600 text-xs">卸载中文化模组</button>
+          </div>
         </div>
       </div>
     </main>
