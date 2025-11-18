@@ -41,20 +41,17 @@ namespace PTCGLiveZhMod.Patches
         /// <summary>
         /// 替换本地化资产包
         /// </summary>
-        [HarmonyPatch(typeof(AssetBundleManager), nameof(AssetBundleManager.LoadAssetBundle), new Type[] { typeof(LoadParams) })]
+        [HarmonyPatch(typeof(AssetBundleManager), "DownloadOrLoadFromCacheBundle")]
         [HarmonyPrefix]
-        static bool AssetBundleManager_DownloadOrLoadFromCacheBundlePrefix(ref System.Collections.IEnumerator __result, Dictionary<string, AssetBundleObject> ___availableBundles, Dictionary<string, AssetBundleObject> ___loadedBundles, LoadParams loadParams)
+        static bool AssetBundleManager_DownloadOrLoadFromCacheBundlePrefix(ref System.Collections.IEnumerator __result, Dictionary<string, AssetBundleObject> ___loadedBundles, AssetBundleObject bundleInfo)
         {
-            var name = loadParams.bundleName;
+            var name = bundleInfo.LocalizedBundleName;
             var bundle = AssetBundleManagerX.LoadAssetBundle(name);
             if (bundle != null)
             {
-                AssetBundleObject bundleInfo = ___availableBundles[name];
+                ___loadedBundles.Add(bundleInfo.LocalizedBundleName, bundleInfo);
+                bundleInfo.isLoading = false;
                 bundleInfo.SetAssetBundle(bundle);
-                if (!___loadedBundles.ContainsKey(name))
-                {
-                    ___loadedBundles.Add(name, bundleInfo);
-                }
                 __result = Helper.YieldBreak();
                 return false;
             }
