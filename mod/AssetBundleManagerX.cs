@@ -14,18 +14,21 @@ namespace PTCGLiveZhMod
 
         public static AssetBundle LoadAssetBundle(string bundleName)
         {
-            if (LoadedBundles.ContainsKey(bundleName))
+            if (LoadedBundles.TryGetValue(bundleName, out AssetBundle bundle) && bundle != null)
             {
-                return LoadedBundles[bundleName];
+                if (bundle != null)
+                {
+                    return bundle;
+                }
             }
             var bundlePath = Path.Combine(Plugin.AssetsDirectory, bundleName);
             if (File.Exists(bundlePath))
             {
                 try
                 {
-                    var bundle = AssetBundle.LoadFromFile(bundlePath);
-                    LoadedBundles[bundleName] = bundle;
-                    return bundle;
+                    var __bundle = AssetBundle.LoadFromFile(bundlePath);
+                    LoadedBundles[bundleName] = __bundle;
+                    return __bundle;
                 }
                 catch (Exception ex)
                 {

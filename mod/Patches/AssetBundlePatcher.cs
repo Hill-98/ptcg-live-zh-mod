@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TPCI.AssetBundleSystem;
 using TPCI.CardShaders;
 using UnityEngine;
+using static TPCI.AssetBundleSystem.AssetBundleManager;
 
 namespace PTCGLiveZhMod.Patches
 {
@@ -40,14 +41,15 @@ namespace PTCGLiveZhMod.Patches
         /// <summary>
         /// 替换本地化资产包
         /// </summary>
-        [HarmonyPatch(typeof(AssetBundleManager), "DownloadOrLoadFromCacheBundle")]
+        [HarmonyPatch(typeof(AssetBundleManager), nameof(AssetBundleManager.LoadAssetBundle), new Type[] { typeof(LoadParams) })]
         [HarmonyPrefix]
-        static bool AssetBundleManager_DownloadOrLoadFromCacheBundlePrefix(ref System.Collections.IEnumerator __result, Dictionary<string, AssetBundleObject> ___loadedBundles, AssetBundleObject bundleInfo)
+        static bool AssetBundleManager_DownloadOrLoadFromCacheBundlePrefix(ref System.Collections.IEnumerator __result, Dictionary<string, AssetBundleObject> ___availableBundles, Dictionary<string, AssetBundleObject> ___loadedBundles, LoadParams loadParams)
         {
-            var name = bundleInfo.bundleName;
+            var name = loadParams.bundleName;
             var bundle = AssetBundleManagerX.LoadAssetBundle(name);
             if (bundle != null)
             {
+                AssetBundleObject bundleInfo = ___availableBundles[name];
                 bundleInfo.SetAssetBundle(bundle);
                 if (!___loadedBundles.ContainsKey(name))
                 {
