@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PTCGLiveZhMod
 {
-    [BepInPlugin("c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3", "ptcg-live-zh-mod", "0.2.3")]
+    [BepInPlugin("c04dfa3f-14f5-40b8-9f63-1d2d13b29bb3", "ptcg-live-zh-mod", "0.2.9")]
     public class Plugin : BaseUnityPlugin
     {
         public static string BaseDirectory { get { return Path.GetDirectoryName(Instance.Info.Location); } }
