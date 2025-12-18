@@ -247,7 +247,7 @@ async function selectPluginAssetsPackage(window: BrowserWindow, localVersion?: n
   try {
     const meta = JSON.parse(await readFile(join(asar, 'meta.json'), { encoding: 'utf-8' }))
     const fromVersion = meta.fromVersion ?? 0
-    return localVersion === undefined || localVersion === fromVersion ? asar : 2
+    return localVersion === undefined || fromVersion === 0 || localVersion === fromVersion ? asar : 2
   } catch (err) {
     console.error(err)
   }
