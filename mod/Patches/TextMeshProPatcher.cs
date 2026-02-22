@@ -16,8 +16,8 @@ namespace PTCGLiveZhMod.Patches
         /// <summary>
         /// 强制修改 TextMeshPro 字体
         /// </summary>
-        [HarmonyPatch(typeof(TextMeshPro), nameof(TextMeshPro.SetLayoutDirty))]
-        [HarmonyPatch(typeof(TextMeshPro), nameof(TextMeshPro.SetMaterialDirty))]
+        [HarmonyPatch(typeof(TextMeshPro), "SetLayoutDirty")]
+        [HarmonyPatch(typeof(TextMeshPro), "SetMaterialDirty")]
         [HarmonyPrefix]
         static void TextMeshPro_LoadFontAssetPrefix(TextMeshPro __instance)
         {
@@ -38,8 +38,8 @@ namespace PTCGLiveZhMod.Patches
         /// <summary>
         /// 强制修改 TextMeshProUGUI 字体
         /// </summary>
-        [HarmonyPatch(typeof(TextMeshProUGUI), nameof(TextMeshProUGUI.SetLayoutDirty))]
-        [HarmonyPatch(typeof(TextMeshProUGUI), nameof(TextMeshProUGUI.SetMaterialDirty))]
+        [HarmonyPatch(typeof(TextMeshProUGUI), "SetLayoutDirty")]
+        [HarmonyPatch(typeof(TextMeshProUGUI), "SetMaterialDirty")]
         [HarmonyPrefix]
         static void TextMeshProUGUI_LoadFontAssetPrefix(TextMeshProUGUI __instance)
         {
