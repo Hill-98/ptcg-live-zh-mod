@@ -1,7 +1,7 @@
 {
   "name": "ptcgl-zh-mod-manager",
   "productName": "PTCGL 中文化模组管理器",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "PTCGL 中文化模组管理器",
   "main": ".vite/main/main.js",
   "type": "module",
@@ -39,7 +39,7 @@
     "@types/plist": "^3.0.5",
     "@types/yauzl": "^2.10.3",
     "electron": "^39.0.0",
-    "electron-forge-maker-7zsfx": "^1.1.1",
+    "electron-forge-maker-7zsfx": "^1.2.0",
     "typescript": "~5.9.0",
     "vite": "^7.2.2"
   },
