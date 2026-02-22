@@ -35,27 +35,19 @@ namespace PTCGLiveZhMod.Patches
         /// 本地化卡牌数据库
         /// </summary>
         [HarmonyPatch(typeof(ConfigCardDataTablesProvider), nameof(ConfigCardDataTablesProvider.GetCardDataTables))]
-        [HarmonyPostfix]
+        [HarmonyPrefix]
         static void ConfigCardDataTablesProvider_GetCardDataTablesPostfix(IEnumerable<CardDataTable> ___dataTables)
         {
             foreach (var table in ___dataTables)
             {
                 foreach (DataRow row in table.SourceDataTable.Rows)
                 {
-                    if (Configuration.DumpAllCards.Value)
+                    try
                     {
-                        try
+                        if (Configuration.DumpAllCards.Value)
                         {
                             Plugin.DumpCard(row);
                         }
-                        catch (Exception ex)
-                        {
-                            Plugin.LoggerInstance.LogError(ex);
-                        }
-                    }
-
-                    try
-                    {
                         Plugin.LocCard(row);
                     }
                     catch (Exception ex)

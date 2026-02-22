@@ -123,7 +123,7 @@ namespace PTCGLiveZhMod
             Task.Run(() =>
             {
                 File.WriteAllText(file, text);
-            }).Start();
+            });
         }
 
         public static bool GetLocText(string key, out string text)
@@ -138,9 +138,17 @@ namespace PTCGLiveZhMod
 
         public static void LocCard(DataRow row)
         {
+            var text = (string)row["extraSearchText"];
+            if (text.Contains("__zh_loc__"))
+            {
+                return;
+            }
+            row["extraSearchText"] += " __zh_loc__";
             if (namesDatabase.TryGetValue(Helper.md5sum(row["LocalizedCardName"].ToString()), out var name))
             {
                 row["LocalizedCardName"] = name;
+                row["EN Card Name"] = name;
+                row["extraSearchText"] += $" {name}";
             }
             for (int i = 0; i < 4; i++)
             {
@@ -148,6 +156,7 @@ namespace PTCGLiveZhMod
                 if (attksNameDatabase.TryGetValue(Helper.md5sum(row[key].ToString()), out var value))
                 {
                     row[key] = value;
+                    row["extraSearchText"] += $" {value}";
                 }
             }
             for (int i = 0; i < 4; i++)
@@ -156,6 +165,7 @@ namespace PTCGLiveZhMod
                 if (attksTextDatabase.TryGetValue(Helper.md5sum(row[key].ToString()), out var value))
                 {
                     row[key] = value;
+                    row["extraSearchText"] += $" {value}";
                 }
             }
         }
