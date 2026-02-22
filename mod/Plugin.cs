@@ -76,10 +76,6 @@ namespace PTCGLiveZhMod
                 var asmNamePather = Harmony.CreateAndPatchAll(typeof(AssemblyNamePatcher));
                 Harmony.CreateAndPatchAll(typeof(AssetBundlePatcher));
                 Harmony.CreateAndPatchAll(typeof(CardDatabasePatcher));
-                if (Configuration.EnableCardGraphicText.Value)
-                {
-                    Harmony.CreateAndPatchAll(typeof(CardGraphicPatcher));
-                }
                 Harmony.CreateAndPatchAll(typeof(LocalizationPatcher));
                 Harmony.CreateAndPatchAll(typeof(TextMeshProPatcher));
                 asmNamePather.UnpatchSelf();

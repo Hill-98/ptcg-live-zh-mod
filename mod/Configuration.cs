@@ -10,8 +10,6 @@ namespace PTCGLiveZhMod
         public static ConfigEntry<bool> DumpAllLocalizationText { get; private set; }
         public static ConfigEntry<bool> DumpUntranslatedText { get; private set; }
 
-        public static ConfigEntry<bool> EnableCardGraphicText { get; private set; }
-
         private static bool Initialized = false;
         public static void Initialization(ConfigFile config)
         {
@@ -22,7 +20,6 @@ namespace PTCGLiveZhMod
             DumpAllCards = config.Bind("dump", "DumpAllCards", false);
             DumpAllLocalizationText = config.Bind("dump", "DumpAllLocalizationText", false);
             DumpUntranslatedText = config.Bind("dump", "DumpUntranslatedText", true);
-            EnableCardGraphicText = config.Bind("card", "EnableCardGraphicText", false);
         }
     }
 }
