@@ -87,6 +87,7 @@ namespace PTCGLiveZhMod.Patches
             {
                 __result = __result + $" & 中文化卡牌图片资源由 {Plugin.AssetsProvider} 提供";
             }
+            __result = __result + $" ({Plugin.Instance.Info.Metadata.Version})";
         }
     }
 }
