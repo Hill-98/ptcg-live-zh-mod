@@ -4,7 +4,6 @@ export interface AppIpc {
   gameInstallDirectory(dir?: string): string
   installPlugin(): Promise<void>
   installPluginAssets(file: string): Promise<void>
-  hostnameIsValid(): boolean
   pluginFeature(name: 'EnableCardGraphicText', value?: boolean): Promise<boolean | undefined>
   pluginInstalled(): boolean
   pluginUpgradable(): Promise<boolean>

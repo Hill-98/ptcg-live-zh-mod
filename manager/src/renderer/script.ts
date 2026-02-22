@@ -124,13 +124,6 @@ async function main(): Promise<void> {
     return
   }
 
-  if (!await app.$hostnameIsValid()) {
-    await popup('检测到您的计算机名称包含非法字符，将会导致游戏启动后出现错误，请将计算机名称更改为英文后重试。', '', 'warning')
-    window.open('https://xtgs.mivm.cn/guide/faq/InvalidHostname')
-    window.close()
-    return
-  }
-
   setStatusText('正在检查游戏安装目录...')
   let gameDir = await app.$gameInstallDirectory()
 

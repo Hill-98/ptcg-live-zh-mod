@@ -1,6 +1,5 @@
 import { existsSync as exists } from 'node:fs'
 import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
-import { hostname } from 'node:os'
 import { dirname, join } from 'node:path';
 import * as protocolHelper from '@hill-98/electron-forge-plugin-vite/protocol-helper'
 import { getFileVersion } from 'cfv'
@@ -123,13 +122,6 @@ async function getLocalPluginAssetsVersion(state: GlobalState): Promise<number> 
     }
   }
   return 0
-}
-
-function hostnameIsValid(hostname: string): boolean {
-  if (process.platform !== 'win32') {
-    return true
-  }
-  return encodeURIComponent(hostname) === hostname
 }
 
 async function installPlugin(state: GlobalState): Promise<void> {
@@ -485,7 +477,6 @@ ipc.app.handlers = {
     }
     return globalState.config.game_installDirectory ?? ''
   },
-  hostnameIsValid: hostnameIsValid.bind(null, hostname()),
   installPlugin: installPlugin.bind(null, globalState),
   async installPluginAssets(asar: string): Promise<void> {
     let lastProgress = -1
