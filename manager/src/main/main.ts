@@ -493,7 +493,7 @@ ipc.app.handlers = {
       progress = x
     }).finally(() => clearInterval(timer))
   },
-  async pluginFeature(name: 'EnableCardGraphicText', value?: boolean): Promise<boolean | undefined> {
+  async pluginFeature(name: '', value?: boolean): Promise<boolean | undefined> {
     try {
       return await getBepInExManager(globalState)?.configPlugin(PLUGIN_CONFIG_NAME, 'card', name, value) ?? false
     } catch (err) {

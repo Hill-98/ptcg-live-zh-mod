@@ -9,7 +9,6 @@ const ASSETS_NO_INSTALLED = '检测到当前尚未安装中文卡牌资源包，
 const ASSETS_VERSION_IS_LOW = '检测到当前安装的中文卡牌资源包不是最新版本，推荐更新以获得更好中文化体验，是否选择本地的中文卡牌资源包并更新？'
 
 const e = {
-  cardLeftText: document.getElementById('card-left-text') as HTMLInputElement,
   disablePlugin: document.getElementById('disable-plugin') as HTMLInputElement,
   gameInstallPath: document.getElementById('game-install-path') as HTMLInputElement,
   primaryButton: document.getElementById('primary-button') as HTMLButtonElement,
@@ -170,7 +169,6 @@ async function main(): Promise<void> {
     setPrimaryButtonAction('install')
   }
 
-  e.cardLeftText.checked = !!await app.$pluginFeature('EnableCardGraphicText')
   e.disablePlugin.checked = await app.$disablePlugin()
 
   setStatusText('准备就绪')
@@ -190,22 +188,6 @@ try {
 }
 
 if (await app.$pluginInstalled()) {
-  e.cardLeftText.addEventListener('click', () => {
-    setAllButtonDisable(true)
-    app.$pluginFeature('EnableCardGraphicText', e.cardLeftText.checked)
-      .then((result) => {
-        e.cardLeftText.checked = !!result
-        if (result === undefined) {
-          popup('未找到配置文件，请先启动一次游戏以自动生成配置文件。', '', 'warning').catch(console.error)
-        }
-        if (e.cardLeftText.checked) {
-          popup('此功能为实验性功能，可能会对游戏造成未知影响，如果您在游戏里遇到了未知行为，请尝试关闭此功能后重新进入游戏。', '', 'warning').catch(console.error)
-        }
-      })
-      .catch(errorPopup)
-      .finally(setAllButtonDisable.bind(null, false))
-  })
-
   e.disablePlugin.addEventListener('click', () => {
     setAllButtonDisable(true)
     app.$disablePlugin(e.disablePlugin.checked)
@@ -239,7 +221,6 @@ if (await app.$pluginInstalled()) {
     e.preventDefault()
     popup(`请先安装中文化模组。`, '', 'info').catch(console.error)
   }
-  e.cardLeftText.addEventListener('click', noInstallHandler)
   e.disablePlugin.addEventListener('click', noInstallHandler)
 }
 
