@@ -160,15 +160,23 @@ export async function start(options: StartOptions): Promise<void> {
     }
     await exec('/usr/bin/xattr', ['-dr', 'com.apple.quarantine', options.path])
   }
+  if (is.darwin) {
+    return new Promise((resolve, reject) => {
+      spawn('open', ['--arch', 'x86_64', '-a', options.path], {
+        cwd: options.path,
+        detached: true,
+        env: {
+          ...process.env,
+          BEPINEX_ROOT_PATH: options.macos?.bepinex,
+          TOBEY_BEPINEX_LOADER: loader,
+        },
+      }).once('error', reject).once('spawn', resolve)
+    })
+  }
   return new Promise((resolve, reject) => {
     spawn(join(options.path, getExecutable()), [], {
-      cwd: process.platform === 'darwin' ? options.macos?.bepinex : options.path,
+      cwd: options.path,
       detached: true,
-      env: {
-        ...process.env,
-        BEPINEX_ROOT_PATH: options.macos?.bepinex,
-        TOBEY_BEPINEX_LOADER: loader,
-      },
     }).once('error', reject).once('spawn', resolve)
   })
 }
