@@ -15,8 +15,9 @@
   "private": true,
   "scripts": {
     "start": "electron-forge start",
-    "make": "electron-forge make --arch=x64",
-    "package": "electron-forge package --arch=x64"
+    "make-arm64": "electron-forge make --arch arm64",
+    "make-x64": "electron-forge make --arch x64",
+    "package": "electron-forge package"
   },
   "dependencies": {
     "cfv": "^1.2.0",
