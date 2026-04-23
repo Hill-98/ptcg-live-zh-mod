@@ -25,8 +25,8 @@ namespace PTCGLiveZhMod.Patches
             {
                 if (LoadFontAssets())
                 {
-                    __instance.font = Assets["font-alt"] as TMP_FontAsset;
-                    __instance.fontSharedMaterial = Assets["material-alt"] as Material;
+                    __instance.font = Assets["font"] as TMP_FontAsset;
+                    __instance.fontSharedMaterial = Assets["material"] as Material;
                 }
             }
             catch (Exception ex)
@@ -78,17 +78,6 @@ namespace PTCGLiveZhMod.Patches
                 }
                 Assets.Add("font", font);
                 Assets.Add("material", material);
-            }
-
-            if (!Assets.TryGetValue("font-alt", out var _) || !Assets.TryGetValue("material-alt", out var _))
-            {
-                AssetBundleManagerX.LoadFontAssetsAlt(out var font, out var material);
-                if (font == null || material == null)
-                {
-                    return false;
-                }
-                Assets.Add("font-alt", font);
-                Assets.Add("material-alt", material);
             }
             return true;
         }

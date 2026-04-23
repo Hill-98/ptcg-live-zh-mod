@@ -130,9 +130,14 @@ async function installPlugin(state: GlobalState): Promise<void> {
     throw new Error('install plugin failed, BepInExManager is null.')
   }
   const installedVersion = await bep.getPluginVersion(PLUGIN_NAME)
-  if (installedVersion && compare(installedVersion, '0.2.3.0', '<=')) {
-    await bep.uninstallPlugin(PLUGIN_NAME, true)
-    await bep.uninstallPlugin(PLUGIN_CONFIG_NAME, true)
+  if (installedVersion) {
+    if (compare(installedVersion, '0.2.3.0', '<=')) {
+      await bep.uninstallPlugin(PLUGIN_NAME, true)
+      await bep.uninstallPlugin(PLUGIN_CONFIG_NAME, true)
+    }
+    if (compare(installedVersion, '0.2.10.0', '<=')) {
+      await rm(join(await bep.getPluginPath(PLUGIN_NAME) ?? '', 'fonts/NotoSansSC_sdf32_optimized_12k_lzma_2019'))
+    }
   }
   if (!bep.isInstalled() || await bep.isUpgradable()) {
     await bep.install()

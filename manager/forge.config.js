@@ -84,7 +84,7 @@ const config = {
         await mkdir(join(modDir, 'fonts'))
         await mkdir(join(modDir, 'text'))
         await cp(join(_dirname, '../dist/PTCGLiveZhMod.dll'), join(modDir, 'PTCGLiveZhMod.dll'))
-        await cp(join(_dirname, `../fonts/NotoSansSC_sdf32_optimized_12k_lzma_2019_${isDarwin ? 'macos' : 'windows'}.asset`), join(modDir, 'fonts/NotoSansSC_sdf32_optimized_12k_lzma_2019'))
+        await cp(join(_dirname, `../fonts/TextMeshPro_font.${isDarwin ? 'osx' : 'windows'}`), join(modDir, 'fonts/TextMeshPro_font'))
         const files = [
           ...await readdir(join(_dirname, '../databases_zh-CN'), { withFileTypes: true }),
           ...await readdir(join(_dirname, '../text_zh-CN'), { withFileTypes: true }),

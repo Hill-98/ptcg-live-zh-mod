@@ -47,28 +47,8 @@ namespace PTCGLiveZhMod
             var bundle = LoadFontBundle();
             try
             {
-                font = bundle.LoadAsset<TMP_FontAsset>("assets/notosanscjksc-regular sdfop.asset");
-                material = bundle.LoadAsset<Material>("assets/notosanscjksc-regular sdfop.asset");
-            }
-            catch (Exception ex)
-            {
-                Plugin.LoggerInstance.LogError(ex);
-                return false;
-            }
-
-            return font != null && material != null;
-        }
-
-        public static bool LoadFontAssetsAlt(out TMP_FontAsset font, out Material material)
-        {
-            font = null;
-            material = null;
-
-            var bundle = LoadFontBundle();
-            try
-            {
-                font = bundle.LoadAsset<TMP_FontAsset>("assets/notosanscjksc-regular sdfop_alt.asset");
-                material = bundle.LoadAsset<Material>("assets/notosanscjksc-regular sdfop_alt.asset");
+                font = bundle.LoadAsset<TMP_FontAsset>("Assets/MiSans-Medium SDF.asset");
+                material = bundle.LoadAsset<Material>("Assets/MiSans-Medium SDF.asset");
             }
             catch (Exception ex)
             {
@@ -86,7 +66,7 @@ namespace PTCGLiveZhMod
             {
                 try
                 {
-                    bundle = AssetBundle.LoadFromFile(Path.Combine(Plugin.FontsDirectory, "NotoSansSC_sdf32_optimized_12k_lzma_2019"));
+                    bundle = AssetBundle.LoadFromFile(Path.Combine(Plugin.FontsDirectory, "TextMeshPro_font"));
                     LoadedBundles.Add(FontBundleName, bundle);
                 }
                 catch (Exception ex)
