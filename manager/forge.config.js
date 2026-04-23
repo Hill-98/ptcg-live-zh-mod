@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { existsSync as exists } from 'node:fs'
 import { appendFile, cp, mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { join, parse } from 'node:path'
@@ -12,6 +13,16 @@ import pkg from './package.json' with { type: 'json' }
 const _dirname = import.meta.dirname
 const RESOURCES_BUNDLE_DIR = join(_dirname, 'resources/bundle')
 const isDarwin = process.platform === 'darwin'
+const BepInEx = {
+  macos: {
+    sum: '01c2ae782eb016dfd6c345a18dbd2dcafffb3d9d318449d6486689f426b4a323',
+    url: 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.5/BepInEx_macos_universal_5.4.23.5.zip'
+  },
+  windows: {
+    sum: '82f9878551030f54657792c0740d9d51a09500eeae1fba21106b0c441e6732c4',
+    url: 'https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.5/BepInEx_win_x64_5.4.23.5.zip',
+  },
+}
 
 /** @type {import('@electron-forge/shared-types').ForgeConfig} */
 const config = {
@@ -67,8 +78,10 @@ const config = {
   hooks: {
     async generateAssets() {
       const bepInEx = join(RESOURCES_BUNDLE_DIR, 'BepInEx.zip')
-      if (!exists(bepInEx)) {
-        const response = await fetch(`https://github.com/BepInEx/BepInEx/releases/download/v5.4.23.2/BepInEx_${isDarwin ? 'macos' : 'win'}_x64_5.4.23.2.zip`)
+      const downloadItem = isDarwin ? BepInEx.macos : BepInEx.windows
+      if (!exists(bepInEx) || createHash('sha256').update(await readFile(bepInEx)).digest('hex').toLowerCase() !== downloadItem.sum) {
+        console.warn('Downloading BepInEx ...')
+        const response = await fetch(downloadItem.url)
         if (response.status !== 200) {
           throw new Error('Failed to download BepInEx.')
         }
