@@ -50,6 +50,8 @@ Pokémon Trading Card Game 版权属于 Pokémon Company (Pokémon), Nintendo, G
 
 中文化模组使用到的中文化卡牌图片资源均来自网络。
 
+中文化模组使用的 MiSans 字体版权归原作者所有。
+
 ## 感谢
 
 感谢 [bbepis/XUnity.AutoTranslator](https://github.com/bbepis/XUnity.AutoTranslator) 项目提供的中文字体资源 **arialuni_sdf_u2019**
