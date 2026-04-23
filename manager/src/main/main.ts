@@ -136,7 +136,7 @@ async function installPlugin(state: GlobalState): Promise<void> {
       await bep.uninstallPlugin(PLUGIN_CONFIG_NAME, true)
     }
     if (compare(installedVersion, '0.2.10.0', '<=')) {
-      await rm(join(await bep.getPluginPath(PLUGIN_NAME) ?? '', 'fonts/NotoSansSC_sdf32_optimized_12k_lzma_2019'))
+      await rm(join(await bep.getPluginPath(PLUGIN_NAME) ?? '', '../fonts/NotoSansSC_sdf32_optimized_12k_lzma_2019'))
     }
   }
   if (!bep.isInstalled() || await bep.isUpgradable()) {
