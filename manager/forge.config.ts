@@ -27,11 +27,26 @@ const BepInEx = {
 
 export default {
   packagerConfig: {
+    asar: {
+      unpack: isDarwin ? undefined : '**/bin/**',
+    },
     appBundleId: pkg.name,
     appCopyright: 'Copyright (c) 2024-2025 Hill-98@GitHub',
     appVersion: pkg.version,
     executableName: pkg.name,
     icon: join(_dirname, 'resources/icons/app'),
+    name: pkg.productName,
+    osxSign: {
+      identity: '-',
+      identityValidation: false,
+      optionsForFile: () => ({
+        entitlements: [
+          'com.apple.security.cs.allow-jit',
+          'com.apple.security.cs.allow-unsigned-executable-memory',
+          'com.apple.security.cs.disable-library-validation',
+        ],
+      })
+    },
     ignore(path) {
       if (path === '') {
         return false
@@ -42,10 +57,7 @@ export default {
         return path.match(/^\/(\.vite|bin|resources|package\.json)/) === null
       }
     },
-    name: pkg.productName,
-    asar: {
-      unpack: isDarwin ? undefined : '**/bin/**',
-    },
+
   },
   makers: [
     new MakerDMG({
