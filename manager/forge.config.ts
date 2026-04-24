@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { existsSync as exists } from 'node:fs'
 import { appendFile, cp, mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { join, parse } from 'node:path'
+import type { ForgeConfig } from '@electron-forge/shared-types'
 import { FuseV1Options, FuseVersion } from '@electron/fuses'
 import { MakerDMG } from '@electron-forge/maker-dmg'
 import { FusesPlugin } from '@electron-forge/plugin-fuses'
@@ -24,8 +25,7 @@ const BepInEx = {
   },
 }
 
-/** @type {import('@electron-forge/shared-types').ForgeConfig} */
-const config = {
+export default {
   packagerConfig: {
     appBundleId: pkg.name,
     appCopyright: 'Copyright (c) 2024-2025 Hill-98@GitHub',
@@ -115,12 +115,10 @@ const config = {
       }
 
     },
-    async packageAfterExtract(config, buildPath) {
+    async packageAfterExtract(_, buildPath) {
       await rename(join(buildPath, 'LICENSE'), join(buildPath, 'LICENSE.electron.txt'))
       await cp(join(_dirname, '../LICENSE'), join(buildPath, 'LICENSE.txt'), { force: true })
       await rm(join(buildPath, 'version'), { force: true })
     },
   },
-}
-
-export default config
+} satisfies ForgeConfig
