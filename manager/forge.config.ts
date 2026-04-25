@@ -57,7 +57,6 @@ export default {
         return path.match(/^\/(\.vite|bin|resources|package\.json)/) === null
       }
     },
-
   },
   makers: [
     new MakerDMG({

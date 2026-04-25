@@ -553,7 +553,7 @@ ipc.game.handlers = {
         bepinex: getBepInExManager(globalState)?.paths?.BepInEx ?? MACOS_BEPINEX_PATH,
         core: join(Paths.resourcesBundle, 'BepInExOSXLoader/UnityEngine.CoreModule.dll'),
         loader: join(Paths.resourcesBundle, 'BepInExOSXLoader/Tobey.BepInEx.Bootstrap.dll'),
-        minVersion: '1.23.0',
+        minVersion: '1.37.0',
       } : undefined,
       path: globalState.config.game_installDirectory,
     })
