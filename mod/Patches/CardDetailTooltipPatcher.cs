@@ -27,7 +27,8 @@ namespace PTCGLiveZhMod.Patches
         /// Hook BigCardOverlayController.Setup - 主页点击卡牌放大时触发
         /// Setup 是所有主页卡牌放大详情的入口方法
         /// 在第53186行设置了 selectedCard = archetypeStack.GetPreferredDisplayCard()
-        /// 通过反射获取 selectedCard 属性的 LongFormID（即 cardSourceID）
+        /// selectedCard 实际运行时是 CardDataRow 类型（实现 ICardDataRow 接口）
+        /// 直接将 selectedCard 作为 CardDataRow 使用，无需再用 ID 查数据库
         /// </summary>
         [HarmonyPatch(typeof(BigCardOverlayController), "Setup")]
         [HarmonyPostfix]
@@ -44,14 +45,8 @@ namespace PTCGLiveZhMod.Patches
                 var cardDataRow = selectedCardProp.GetValue(__instance);
                 if (cardDataRow == null) return;
 
-                // 通过反射获取 LongFormID（等同于 cardSourceID，格式如 "swsh1_123_SV"）
-                var longFormIdProp = cardDataRow.GetType().GetProperty("LongFormID");
-                if (longFormIdProp == null) return;
-
-                var longFormId = (string)longFormIdProp.GetValue(cardDataRow);
-                if (string.IsNullOrEmpty(longFormId)) return;
-
-                ShowDetailTooltip(longFormId, isRight: true);
+                // 直接显示翻译（不通过数据库重新查询）
+                ShowDetailTooltipFromCardRow(cardDataRow);
             }
             catch (System.Exception ex)
             {
@@ -121,6 +116,9 @@ namespace PTCGLiveZhMod.Patches
         // 共用 UI 创建和显示逻辑
         // ===========================
 
+        /// <summary>
+        /// 通过 cardSourceID 查询数据库显示翻译（战斗场景使用）
+        /// </summary>
         private static void ShowDetailTooltip(string cardSourceId, bool isRight)
         {
             EnsureTooltipCreated();
@@ -144,6 +142,45 @@ namespace PTCGLiveZhMod.Patches
             }
 
             PositionTooltip(isRight);
+            tooltipRoot.SetActive(true);
+
+            // 强制重建布局
+            LayoutRebuilder.ForceRebuildLayoutImmediate(
+                tooltipRoot.GetComponent<RectTransform>());
+        }
+
+        /// <summary>
+        /// 直接使用已有的 CardDataRow 显示翻译（主页场景使用）
+        /// selectedCard 运行时就是 CardDataRow 实例，直接转型使用
+        /// </summary>
+        private static void ShowDetailTooltipFromCardRow(object cardDataRowObj)
+        {
+            EnsureTooltipCreated();
+
+            if (tooltipRoot == null || tooltipText == null || cardDataRowObj == null)
+            {
+                return;
+            }
+
+            // ICardDataRow 运行时实际就是 CardDataRow，直接作为 CardDataRow 使用
+            if (cardDataRowObj is CardDataRow cardDataRow)
+            {
+                tooltipText.text = BuildCardText(cardDataRow);
+            }
+            else
+            {
+                // 兜底：通过反射获取 CardID，再查数据库
+                var cardIdProp = cardDataRowObj.GetType().GetProperty("CardID");
+                if (cardIdProp != null)
+                {
+                    var cardId = (string)cardIdProp.GetValue(cardDataRowObj);
+                    ShowDetailTooltip(cardId, isRight: true);
+                    return;
+                }
+                tooltipText.text = "<size=22><b>无法读取卡牌数据</b></size>";
+            }
+
+            PositionTooltip(isRight: true);
             tooltipRoot.SetActive(true);
 
             // 强制重建布局
