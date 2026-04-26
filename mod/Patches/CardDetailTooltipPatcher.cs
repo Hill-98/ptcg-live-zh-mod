@@ -9,7 +9,7 @@ namespace PTCGLiveZhMod.Patches
     /// <summary>
     /// 卡牌详情放大时显示中文翻译悬浮框
     /// 覆盖两种场景：
-    /// 1. 主页浏览卡牌（BigCardOverlayController.SetupLargeCard）
+    /// 1. 主页浏览卡牌（BigCardOverlayController.Setup / SetupLargeCard）
     /// 2. 战斗中点击卡牌放大查看（SingleCardViewMenu.Show）
     /// 悬浮框显示在屏幕右侧
     /// </summary>
@@ -36,17 +36,7 @@ namespace PTCGLiveZhMod.Patches
         {
             try
             {
-                // 通过反射获取 selectedCard 属性（protected ICardDataRow）
-                var selectedCardProp = __instance.GetType().GetProperty("selectedCard",
-                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
-
-                if (selectedCardProp == null) return;
-
-                var cardDataRow = selectedCardProp.GetValue(__instance);
-                if (cardDataRow == null) return;
-
-                // 直接显示翻译（不通过数据库重新查询）
-                ShowDetailTooltipFromCardRow(cardDataRow);
+                ShowTooltipFromInstance(__instance, "主页");
             }
             catch (System.Exception ex)
             {
@@ -112,9 +102,62 @@ namespace PTCGLiveZhMod.Patches
             HideDetailTooltip();
         }
 
+        /// <summary>
+        /// Hook BigCardOverlayController.NextClicked - 点击下一张按钮时刷新翻译
+        /// NextClicked 是 public 方法，无重载，Harmony 可以直接按名称匹配
+        /// 内部会更新 selectedCard 然后调用 SetupForNewArchetype
+        /// </summary>
+        [HarmonyPatch(typeof(BigCardOverlayController), "NextClicked")]
+        [HarmonyPostfix]
+        static void NextClickedPostfix(object __instance)
+        {
+            try
+            {
+                ShowTooltipFromInstance(__instance, "下一张");
+            }
+            catch (System.Exception ex)
+            {
+                Plugin.LoggerInstance.LogWarning("CardDetailTooltip [下一张]: 获取卡牌信息失败 - " + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Hook BigCardOverlayController.PrevClicked - 点击上一张按钮时刷新翻译
+        /// PrevClicked 是 public 方法，无重载，Harmony 可以直接按名称匹配
+        /// </summary>
+        [HarmonyPatch(typeof(BigCardOverlayController), "PrevClicked")]
+        [HarmonyPostfix]
+        static void PrevClickedPostfix(object __instance)
+        {
+            try
+            {
+                ShowTooltipFromInstance(__instance, "上一张");
+            }
+            catch (System.Exception ex)
+            {
+                Plugin.LoggerInstance.LogWarning("CardDetailTooltip [上一张]: 获取卡牌信息失败 - " + ex.Message);
+            }
+        }
+
         // ===========================
-        // 共用 UI 创建和显示逻辑
+        // 共用逻辑
         // ===========================
+
+        /// <summary>
+        /// 从 BigCardOverlayController 实例获取 selectedCard 并显示翻译
+        /// </summary>
+        private static void ShowTooltipFromInstance(object instance, string logTag)
+        {
+            var selectedCardProp = instance.GetType().GetProperty("selectedCard",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public);
+
+            if (selectedCardProp == null) return;
+
+            var cardDataRow = selectedCardProp.GetValue(instance);
+            if (cardDataRow == null) return;
+
+            ShowDetailTooltipFromCardRow(cardDataRow);
+        }
 
         /// <summary>
         /// 通过 cardSourceID 查询数据库显示翻译（战斗场景使用）
