@@ -78,6 +78,9 @@ namespace PTCGLiveZhMod
                 Harmony.CreateAndPatchAll(typeof(CardDatabasePatcher));
                 Harmony.CreateAndPatchAll(typeof(LocalizationPatcher));
                 Harmony.CreateAndPatchAll(typeof(TextMeshProPatcher));
+                Harmony.CreateAndPatchAll(typeof(CardHoverTooltipPatcher));
+                Harmony.CreateAndPatchAll(typeof(CardDetailTooltipPatcher));
+                Harmony.CreateAndPatchAll(typeof(BoosterCardTooltipPatcher));
                 asmNamePather.UnpatchSelf();
             }
             catch (Exception ex)
