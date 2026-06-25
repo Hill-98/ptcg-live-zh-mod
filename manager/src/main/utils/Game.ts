@@ -162,7 +162,12 @@ export async function start(options: StartOptions): Promise<void> {
   }
   if (is.darwin) {
     return new Promise((resolve, reject) => {
-      spawn('open', ['--arch', 'x86_64' ,'-a', options.path], {
+      const args = []
+      if (process.arch !== 'x64') {
+        args.push('--arch', 'x86_64')
+      }
+      args.push('-a', options.path)
+      spawn('open', args, {
         cwd: options.path,
         detached: true,
         env: {
