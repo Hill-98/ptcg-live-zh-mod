@@ -6,6 +6,7 @@ import { compare } from 'compare-versions'
 import { app } from 'electron'
 import plist from 'plist'
 import { bin } from '../Paths.ts'
+import { release } from 'node:os'
 
 interface ExecResult {
   status: number
@@ -30,7 +31,7 @@ const is = {
   win32: process.platform === 'win32',
 }
 
-export async function clearUnityCache() {
+export async function clearUnityCache(): Promise<void> {
   if (is.darwin) {
     const path = join(process.env.HOME ?? app.getPath('home'), 'Library/Caches/com.pokemon.pokemontcgl')
     if (exists(path)) {
@@ -162,12 +163,15 @@ export async function start(options: StartOptions): Promise<void> {
   }
   if (is.darwin) {
     return new Promise((resolve, reject) => {
+      const newMac = compare(release(), '23.0.0', '>=')
       const args = []
-      if (process.arch !== 'x64') {
-        args.push('--arch', 'x86_64')
+      if (newMac) {
+        if (process.arch !== 'x64') {
+          args.push('--arch', 'x86_64')
+        }
+        args.push('-a', options.path)
       }
-      args.push('-a', options.path)
-      spawn('open', args, {
+      spawn(newMac ? 'open' : join(options.path, getExecutable()), args, {
         cwd: options.path,
         detached: true,
         env: {
